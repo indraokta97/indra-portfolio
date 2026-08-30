@@ -89,7 +89,7 @@ export default function Writing({ slug }) {
                 <aside className="hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-30">
                     <div className="pixel-border bg-sky-texture p-2 flex flex-col gap-2">
                         <div className="font-pixel text-[7px] text-[#3A4657] text-center uppercase tracking-wider mb-1 px-1">Levels</div>
-                        {[{ n: 1, name: 'Code', href: '/stage/1', bg: 'bg-[#73DC57]', text: 'text-[#101020]' }, { n: 2, name: 'Events', href: '/stage/2', bg: 'bg-[#F05A6E]', text: 'text-white' }, { n: 3, name: 'Words', href: '/stage/3', bg: 'bg-[#36CFDD]', text: 'text-white' }].map(s => (
+                        {[{ n: 1, name: 'Code', href: '/stage/1', bg: 'bg-[#9CA3AF]', text: 'text-[#101020]' }, { n: 2, name: 'Events', href: '/stage/2', bg: 'bg-[#F05A6E]', text: 'text-white' }, { n: 3, name: 'Words', href: '/stage/3', bg: 'bg-[#36CFDD]', text: 'text-white' }].map(s => (
                             <a key={s.n} href={s.href} className={`group flex items-center gap-2 px-2 py-2 ${s.bg} ${s.text} hover:bg-[#FFD51A] hover:text-[#101020] transition-colors`}>
                                 <span className="font-pixel text-xs">0{s.n}</span>
                                 <span className="font-pixel text-[9px] uppercase font-bold whitespace-nowrap hidden group-hover:inline">{s.name}</span>

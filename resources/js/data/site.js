@@ -15,7 +15,7 @@ export const site = {
 };
 
 export const stageConfig = {
-    1: { name: 'Code', color: '#15803D', icon: '⚡' },
+    1: { name: 'Code', color: '#6B7280', icon: '⚡' },
     2: { name: 'Events', color: '#BE123C', icon: '⚔' },
     3: { name: 'Words', color: '#0E7490', icon: '✎' },
 };

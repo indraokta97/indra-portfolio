@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'wouter';
 import AppLayout from '../Layouts/AppLayout';
 import { site } from '../data/site';
@@ -9,40 +9,78 @@ export default function Welcome() {
     const events = site.events;
     const writings = site.writings;
 
+    const hobbyBlurb = "Outside of that, when I'm really, really bored, I usually draw, play PES (I'm actually pretty damn good at it), teach Quran recitation, or tutor if anyone needs a teacher (I'm available).";
+    const hobbyChips = [
+        ['✏️', 'Drawing'],
+        ['⚽', 'PES'],
+        ['🎓', 'Tutoring'],
+    ];
+    const hobbyPhotos = [
+        { src: '/images/hobbies/draw1.jpeg', label: 'Drawing' },
+        { src: '/images/hobbies/draw2.jpeg', label: 'Drawing' },
+        { src: '/images/hobbies/draw3.jpeg', label: 'Drawing' },
+        { src: '/images/hobbies/bigwin.png', label: 'PES — Big Win' },
+        { src: '/images/hobbies/bigwin2.webp', label: 'PES — Big Win' },
+    ];
+    const [hobbyIndex, setHobbyIndex] = useState(0);
+    const [dragging, setDragging] = useState(false);
+    const [dragOffset, setDragOffset] = useState(0);
+    const dragRef = useRef(null);
+    const HobbyDragThreshold = 60;
+    const onHobbyStart = (e) => {
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        dragRef.current = { startX: x, offset: 0 };
+        setDragging(true);
+    };
+    const onHobbyMove = (e) => {
+        if (!dragRef.current) return;
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        const off = x - dragRef.current.startX;
+        dragRef.current.offset = off;
+        setDragOffset(off);
+    };
+    const onHobbyEnd = () => {
+        if (dragRef.current) {
+            const off = dragRef.current.offset;
+            if (off < -HobbyDragThreshold) {
+                setHobbyIndex((i) => (i + 1) % hobbyPhotos.length);
+            } else if (off > HobbyDragThreshold) {
+                setHobbyIndex((i) => (i - 1 + hobbyPhotos.length) % hobbyPhotos.length);
+            }
+        }
+        dragRef.current = null;
+        setDragOffset(0);
+        setDragging(false);
+    };
+
     useEffect(() => {
-        const showLoadingScreen = (text, tips = [], duration = 1400) => {
+        const showLoadingScreen = (duration = 1400) => {
             let screen = document.getElementById('loading-screen');
             if (!screen) {
                 screen = document.createElement('div');
                 screen.id = 'loading-screen';
                 screen.className = 'loading-screen';
                 screen.innerHTML = `
-                    <div class="loading-text" id="loading-text">${text}</div>
-                    <div class="loading-bar">
-                        <div class="loading-bar-fill" id="loading-bar-fill"></div>
+                    <div class="loading-inner">
+                        <video class="loading-logo" src="/images/cm.webm" alt="CM-Indra" autoPlay loop muted playsInline></video>
+                        <div class="loading-right">
+                            <div class="loading-title">INDRAOKTA97</div>
+                            <div class="loading-bar">
+                                <div class="loading-bar-fill" id="loading-bar-fill"></div>
+                            </div>
+                            <div class="loading-status" id="loading-status">▶ LOADING...</div>
+                        </div>
                     </div>
-                    <div class="loading-tips" id="loading-tips"></div>
                 `;
                 document.body.appendChild(screen);
             }
-            document.getElementById('loading-text').textContent = text;
             const fill = document.getElementById('loading-bar-fill');
             fill.style.width = '0%';
-            if (tips.length > 0) {
-                const tipsEl = document.getElementById('loading-tips');
-                tipsEl.textContent = tips[0];
-                let tipIndex = 0;
-                const tipInterval = setInterval(() => {
-                    tipIndex = (tipIndex + 1) % tips.length;
-                    tipsEl.textContent = tips[tipIndex];
-                }, 500);
-                screen._tipInterval = tipInterval;
-            }
             requestAnimationFrame(() => { fill.style.width = '100%'; });
-            setTimeout(() => {
-                if (screen._tipInterval) clearInterval(screen._tipInterval);
+            clearTimeout(screen._loadingT);
+            screen._loadingT = setTimeout(() => {
                 screen.classList.add('fade-out');
-                setTimeout(() => { screen.classList.add('hidden'); }, 400);
+                setTimeout(() => { screen.classList.add('hidden'); }, 450);
             }, duration);
         };
 
@@ -73,13 +111,8 @@ export default function Welcome() {
             if (contactChar) contactChar.classList.remove('hidden');
 
             if (welcome && portfolio) {
-                const tips = [
-                    'TIP: HOVER BUTTONS FOR AUDIO FEEDBACK',
-                    'TIP: CLICK CHARACTERS TO INTERACT',
-                    'TIP: PRESS START 2P FONT INSIDE',
-                ];
                 welcome.style.visibility = 'hidden';
-                showLoadingScreen('LOADING QUEST...', tips, 1400);
+                showLoadingScreen(1400);
                 setTimeout(() => {
                     welcome.style.transition = 'opacity 0.3s ease-out';
                     welcome.style.opacity = '0';
@@ -171,6 +204,38 @@ export default function Welcome() {
             });
         }
 
+        const swapOnHover = (img, animate = false) => {
+            if (!img || img.dataset.swapReady) return;
+            const parent = img.parentElement;
+            if (!parent) return;
+            img.dataset.swapReady = '1';
+            const hover = '/images/indra-peci.webp';
+            const overlay = img.cloneNode(false);
+            overlay.removeAttribute('id');
+            overlay.removeAttribute('class');
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.className = 'w-full h-full object-contain' + (animate ? ' idle-blink idle-float' : '');
+            Object.assign(overlay.style, {
+                position: 'absolute',
+                inset: '0',
+                zIndex: '1',
+                opacity: '0',
+                transition: 'opacity 0.4s ease',
+                pointerEvents: 'none',
+                imageRendering: 'pixelated',
+            });
+            overlay.src = hover;
+            parent.appendChild(overlay);
+            const enter = () => { overlay.style.opacity = '1'; };
+            const leave = () => { overlay.style.opacity = '0'; };
+            img.addEventListener('mouseenter', enter);
+            img.addEventListener('mouseleave', leave);
+        };
+        ['#welcome-character-img', '#hero-char-wrap img'].forEach((sel) => {
+            const el = document.querySelector(sel);
+            if (el) swapOnHover(el, sel.includes('hero-char-wrap'));
+        });
+
         const character = document.getElementById('hero-character');
         const boxes = document.querySelectorAll('.stage-box');
         let isAnimating = false;
@@ -233,6 +298,14 @@ export default function Welcome() {
                     }, walkDuration * 1000);
                 });
             });
+
+            const handlePageShow = () => {
+                isAnimating = false;
+                boxes.forEach((box) => box.classList.remove('box-broken'));
+                character.style.bottom = '0px';
+                requestAnimationFrame(() => positionCharAtBox(boxes[0]));
+            };
+            window.addEventListener('pageshow', handlePageShow);
         }
 
         const welcomeChar = document.getElementById('welcome-character');
@@ -414,10 +487,10 @@ export default function Welcome() {
                             style={{ transition: 'transform 0.08s ease-out' }}
                         >
                             <img
-                                src="/images/player.gif"
+                                src="/images/indra-almet.webp"
                                 alt="Indra greeting"
                                 id="welcome-character-img"
-                                className="w-full h-full drop-shadow-[0_0_20px_rgba(255,214,10,0.3)] drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"
+                                className="w-full h-full object-contain drop-shadow-[0_0_20px_rgba(255,214,10,0.3)] drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]"
                                 style={{ imageRendering: 'pixelated' }}
                             />
 
@@ -493,11 +566,11 @@ export default function Welcome() {
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
 
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
-                            <div className="md:col-span-2 flex justify-center">
+                            <div className="md:col-span-2 flex justify-center mt-8 sm:mt-0">
                                 <div className="text-center">
-                                    <div id="hero-char-wrap" className="w-56 h-56 sm:w-64 sm:h-64 bounce boss-intro mx-auto relative cursor-pointer" style={{ transition: 'transform 0.3s cubic-bezier(0.28, 0.84, 0.42, 1)' }}>
-                                        <img src="/images/player.gif" alt="Indra" className="w-full h-full idle-blink idle-float" style={{ imageRendering: 'pixelated' }} />
-                                        <div id="hero-speech" className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#FFD51A] border-3 border-[#101020] px-3 py-1.5 font-pixel text-[9px] text-[#101020] uppercase whitespace-nowrap pointer-events-none" style={{ boxShadow: '3px 3px 0 #101020', opacity: 1 }}>
+                                    <div id="hero-char-wrap" className="w-40 h-40 sm:w-64 sm:h-64 bounce boss-intro mx-auto relative cursor-pointer mt-6 sm:mt-0" style={{ transition: 'transform 0.3s cubic-bezier(0.28, 0.84, 0.42, 1)' }}>
+                                        <img src="/images/indra-almet.webp" alt="Indra" className="w-full h-full object-contain idle-blink idle-float" style={{ imageRendering: 'pixelated' }} />
+                                        <div id="hero-speech" className="absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 bg-[#FFD51A] border-3 border-[#101020] px-2.5 py-1 sm:px-3 sm:py-1.5 font-pixel text-[8px] sm:text-[9px] text-[#101020] uppercase whitespace-nowrap pointer-events-none" style={{ boxShadow: '3px 3px 0 #101020', opacity: 1 }}>
                                             ▶ Assalamu'alaikum!
                                         </div>
                                     </div>
@@ -524,27 +597,27 @@ export default function Welcome() {
 
                             <div className="md:col-span-3 space-y-6">
                                 <div className="panel-yellow inline-block">
-                                    <h2 className="font-pixel text-2xl sm:text-3xl lg:text-4xl text-[#101020] leading-[1.4] uppercase text-glow">
+                                    <h2 className="font-pixel text-xl sm:text-3xl lg:text-4xl text-[#101020] leading-[1.4] uppercase text-glow">
                                         About Me
                                     </h2>
                                 </div>
 
                                 <div className="panel-pixel bg-[#FFFFFF]/95">
                                     <div className="font-pixel text-[10px] text-[#105E3D] mb-2 uppercase">▶ INTRO</div>
-                                    <p className="font-retro text-lg sm:text-xl text-[#101020] leading-relaxed">
+                                    <p className="font-retro text-base sm:text-xl text-[#101020] leading-relaxed">
                                         Nuclear Engineering graduate from{' '}
                                         <span className="text-[#B45309]">Universitas Gadjah Mada.</span>{' '}
                                         Trained to do nuclear things, but somehow I ended up
                                         building websites, organizing events, and writing random stuff.
                                     </p>
 
-                                    <p className="font-retro text-lg sm:text-xl text-[#101020] leading-relaxed mt-3">
+                                    <p className="font-retro text-base sm:text-xl text-[#101020] leading-relaxed mt-3">
                                         <span className="text-[#105E3D]">
                                             Nuclear by degree, web by hobby, event by passion,
                                             and writer by 'gabut'. Powered by caffeine and AI wkwk.
                                         </span>{' '}
                                         <span className="text-[#B45309]">
-                                            Career plan? Loading... AI is still generating it.
+                                            More intro? Loading... AI is still generating it.
                                         </span>
                                     </p>
                                 </div>
@@ -552,72 +625,66 @@ export default function Welcome() {
                                 <div>
                                     <div className="font-pixel text-[9px] text-[#105E3D] mb-3 uppercase">▶ TECH STACK</div>
                                     <div className="space-y-2 overflow-hidden">
-                                        <div className="tech-marquee tech-marquee-right">
-                                            <div className="tech-track">
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" className="tech-icon" /><span>HTML</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" className="tech-icon" /><span>CSS</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" className="tech-icon" /><span>JavaScript</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind" className="tech-icon" /><span>Tailwind CSS</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" className="tech-icon" /><span>Vite</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg" alt="Canva" className="tech-icon" /><span>Canva</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" className="tech-icon" /><span>Figma</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://th.bing.com/th/id/R.f5e162016470f2e852d4fc0d9b180f9e?rik=t49jQ68Kcfv%2fIg&pid=ImgRaw&r=0" alt="CorelDraw" className="tech-icon" /><span>CorelDraw</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" className="tech-icon" /><span>HTML</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" className="tech-icon" /><span>CSS</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" className="tech-icon" /><span>JavaScript</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" alt="Tailwind" className="tech-icon" /><span>Tailwind CSS</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" alt="Vite" className="tech-icon" /><span>Vite</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg" alt="Canva" className="tech-icon" /><span>Canva</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" alt="Figma" className="tech-icon" /><span>Figma</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://th.bing.com/th/id/R.f5e162016470f2e852d4fc0d9b180f9e?rik=t49jQ68Kcfv%2fIg&pid=ImgRaw&r=0" alt="CorelDraw" className="tech-icon" /><span>CorelDraw</span></div>
-                                            </div>
-                                        </div>
-
-                                        <div className="tech-marquee tech-marquee-left">
-                                            <div className="tech-track">
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" className="tech-icon" /><span>Java</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" className="tech-icon" /><span>PHP</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" className="tech-icon" /><span>Laravel</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" className="tech-icon" /><span>MySQL</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite" className="tech-icon" /><span>SQLite</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg" alt="WordPress" className="tech-icon" /><span>WordPress</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="SEO" className="tech-icon" /><span>SEO</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Analytics" className="tech-icon" /><span>Google Analytics</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Search Console" className="tech-icon" /><span>Search Console</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" className="tech-icon" /><span>Java</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP" className="tech-icon" /><span>PHP</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" alt="Laravel" className="tech-icon" /><span>Laravel</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="MySQL" className="tech-icon" /><span>MySQL</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" alt="SQLite" className="tech-icon" /><span>SQLite</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg" alt="WordPress" className="tech-icon" /><span>WordPress</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="SEO" className="tech-icon" /><span>SEO</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Analytics" className="tech-icon" /><span>Google Analytics</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Search Console" className="tech-icon" /><span>Search Console</span></div>
-                                            </div>
-                                        </div>
-
-                                        <div className="tech-marquee tech-marquee-right">
-                                            <div className="tech-track">
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" className="tech-icon" /><span>Git</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" className="tech-icon" /><span>GitHub</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub Actions" className="tech-icon" /><span>GitHub Actions</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg" alt="Vercel" className="tech-icon" /><span>Vercel</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://railway.com/brand/logo-dark.png" alt="Railway" className="tech-icon" /><span>Railway</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" className="tech-icon" /><span>VS Code</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" alt="npm" className="tech-icon" /><span>npm</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" className="tech-icon" /><span>Composer</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Gemini AI" className="tech-icon" /><span>Gemini AI</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" className="tech-icon" /><span>Git</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub" className="tech-icon" /><span>GitHub</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub Actions" className="tech-icon" /><span>GitHub Actions</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg" alt="Vercel" className="tech-icon" /><span>Vercel</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://railway.com/brand/logo-dark.png" alt="Railway" className="tech-icon" /><span>Railway</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" className="tech-icon" /><span>VS Code</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" className="tech-icon" /><span>VS Code</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg" alt="Composer" className="tech-icon" /><span>Composer</span></div>
-                                                <div className="tech-item"><img loading="lazy" decoding="async" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Gemini AI" className="tech-icon" /><span>Gemini AI</span></div>
-                                            </div>
-                                        </div>
+                                        {[
+                                            {
+                                                dir: 'tech-marquee-right',
+                                                items: [
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg', 'HTML'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg', 'CSS'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg', 'JavaScript'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', 'React'],
+                                                    ['/images/inertia-logo.svg', 'Inertia'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', 'Tailwind CSS'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg', 'Vite'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg', 'Canva'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg', 'Figma'],
+                                                ],
+                                            },
+                                            {
+                                                dir: 'tech-marquee-left',
+                                                items: [
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg', 'PHP'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg', 'Laravel'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg', 'MySQL'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg', 'SQLite'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg', 'WordPress'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg', 'C++'],
+                                                    [null, 'TOPAS Monte Carlo', '☢'],
+                                                    [null, 'Geant4', '◈'],
+                                                ],
+                                            },
+                                            {
+                                                dir: 'tech-marquee-right',
+                                                items: [
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg', 'Git'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', 'GitHub'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg', 'Vercel'],
+                                                    ['https://railway.com/brand/logo-dark.png', 'Railway'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg', 'VS Code'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg', 'npm'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg', 'Composer'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', 'Gemini AI'],
+                                                ],
+                                            },
+                                        ].map((row, i) => {
+                                            const doubled = [...row.items, ...row.items];
+                                            return (
+                                                <div key={i} className={`tech-marquee ${row.dir}`}>
+                                                    <div className="tech-track">
+                                                        {doubled.map(([icon, label, glyph], j) => (
+                                                            <div key={j} className="tech-item">
+                                                                {icon ? (
+                                                                    <img loading="lazy" decoding="async" src={icon} alt={label} className="tech-icon" />
+                                                                ) : (
+                                                                    <span className="tech-icon tech-glyph" aria-hidden="true">{glyph || '✦'}</span>
+                                                                )}
+                                                                <span>{label}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
@@ -629,16 +696,16 @@ export default function Welcome() {
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-6">
                             <div className="font-pixel text-[10px] text-[#B45309] mb-2 uppercase cursor-blink">▶ SELECT YOUR STAGE ▶</div>
-                            <h2 className="font-pixel text-xl sm:text-2xl text-[#101020] uppercase">Choose Your Quest</h2>
-                            <p className="font-retro text-base sm:text-lg text-[#3A4657] mt-2">Some things i've worked on</p>
+                            <h2 className="font-pixel text-lg sm:text-2xl text-[#101020] uppercase">Choose Your Quest</h2>
+                            <p className="font-retro text-sm sm:text-lg text-[#3A4657] mt-2">Some things i've worked on</p>
                         </div>
 
                         <div id="stage-boxes" className="grid grid-cols-3 gap-3 sm:gap-4 max-w-3xl mx-auto mb-4">
-                            <a href="/stage/1" data-box="box-1" className="stage-box pixel-card text-center p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#105E3D] block" style={{ animationDelay: '0s' }}>
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto flex items-center justify-center bg-[#73DC57] border-3 border-[#101020] font-display text-2xl sm:text-3xl mb-2">
+                            <a href="/stage/1" data-box="box-1" className="stage-box pixel-card text-center p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#6B7280] block" style={{ animationDelay: '0s' }}>
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto flex items-center justify-center bg-[#9CA3AF] border-3 border-[#101020] font-display text-2xl sm:text-3xl mb-2 text-[#101020]">
                                     ⚡
                                 </div>
-                                <div className="font-pixel text-[10px] text-[#105E3D] uppercase mb-1">▶ STAGE 1</div>
+                                <div className="font-pixel text-[10px] text-[#6B7280] uppercase mb-1">▶ STAGE 1</div>
                                 <h3 className="font-display text-base sm:text-lg text-[#101020] uppercase">Code</h3>
                                 <p className="font-retro text-sm text-[#3A4657]">{projectsCount} builds</p>
                             </a>
@@ -663,8 +730,93 @@ export default function Welcome() {
                         </div>
 
                         <div className="flex justify-start">
-                            <div id="hero-character" className="relative" style={{ width: '80px', height: '80px' }}>
-                                <img src="/images/player.gif" alt="Indra" className="w-full h-full" style={{ imageRendering: 'pixelated' }} id="hero-character-img" />
+                            <div id="hero-character" className="relative" style={{ width: '96px', height: '96px' }}>
+                                <video
+                                    src="/images/indra-lari.webm"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    preload="auto"
+                                    disablePictureInPicture
+                                    className="w-full h-full object-contain"
+                                    style={{ imageRendering: 'pixelated' }}
+                                    id="hero-character-img"
+                                    aria-hidden="true"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="bg-sky-texture py-4 sm:py-5" id="hobbies">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex items-center gap-3 mb-3">
+                            <span className="font-pixel text-[7px] text-[#B45309]">▶ HOBBIES</span>
+                            <div className="flex-1 h-px bg-[#F05A6E]"></div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-6 gap-3 lg:gap-4 items-start">
+                            <div className="lg:col-span-4">
+                                <h2 className="font-pixel text-[13px] sm:text-base text-[#101020] mb-1 uppercase">
+                                    When I'm Bored
+                                </h2>
+                                <p className="font-retro text-[11px] sm:text-xs text-[#3A4657] leading-relaxed">
+                                    {hobbyBlurb}
+                                </p>
+                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                    {hobbyChips.map(([icon, label]) => (
+                                        <span key={label} className="inline-flex items-center gap-1 font-pixel text-[7px] uppercase px-1.5 py-0.5 bg-[#FFFFFF] border-2 border-[#101020] text-[#101020] shadow-[2px_2px_0_#101020]">
+                                            <span>{icon}</span>{label}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-2">
+                                <div
+                                    className="pixel-card relative overflow-hidden select-none"
+                                    style={{ cursor: dragging ? 'grabbing' : 'grab', touchAction: 'none' }}
+                                    onMouseDown={onHobbyStart}
+                                    onMouseMove={onHobbyMove}
+                                    onMouseUp={onHobbyEnd}
+                                    onMouseLeave={onHobbyEnd}
+                                    onTouchStart={onHobbyStart}
+                                    onTouchMove={onHobbyMove}
+                                    onTouchEnd={onHobbyEnd}
+                                >
+                                    <div className="relative w-full h-32 sm:h-40 overflow-hidden">
+                                        <div
+                                            className="flex h-full"
+                                            style={{
+                                                transform: `translateX(calc(${-hobbyIndex * 100}% + ${dragOffset}px))`,
+                                                transition: dragging ? 'none' : 'transform 0.3s cubic-bezier(0.25,0.8,0.25,1)',
+                                            }}
+                                        >
+                                            {hobbyPhotos.map((hp) => (
+                                                <div key={hp.src} className="relative w-full h-full shrink-0 flex items-center justify-center">
+                                                    <img src={hp.src} alt="" aria-hidden="true" draggable="false" className="absolute inset-0 w-full h-full object-cover scale-110 blur-lg brightness-75" />
+                                                    <img src={hp.src} alt={hp.label} draggable="false" className="relative max-w-full max-h-full object-contain" style={{ imageRendering: 'auto' }} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="absolute top-1 left-1 font-pixel text-[6px] px-1 py-0.5 bg-[#FFD51A] text-[#101020] border-2 border-[#101020] uppercase shadow-[2px_2px_0_#101020]">
+                                        {dragging ? 'holding...' : '✋ drag'}
+                                    </div>
+                                    <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-0.5">
+                                        {hobbyPhotos.map((hp, i) => (
+                                            <button
+                                                key={hp.src}
+                                                type="button"
+                                                onClick={() => setHobbyIndex(i)}
+                                                aria-label={hp.label}
+                                                className={`w-1.5 h-1.5 border-2 border-[#101020] ${i === hobbyIndex ? 'bg-[#F05A6E]' : 'bg-[#FFFFFF] hover:bg-[#FFD51A]'}`}
+                                            ></button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="font-pixel text-[6px] text-[#55607A] uppercase mt-1.5 text-center">{hobbyPhotos[hobbyIndex].label}</p>
                             </div>
                         </div>
                     </div>
@@ -677,42 +829,36 @@ export default function Welcome() {
                             <div className="flex-1 h-1 bg-[#FFD51A]"></div>
                         </div>
 
-                        <h2 className="font-pixel text-2xl sm:text-3xl text-[#101020] mb-3 uppercase">
+                        <h2 className="font-pixel text-xl sm:text-3xl text-[#101020] mb-3 uppercase">
                             Get In Touch
                         </h2>
-                        <p className="font-retro text-lg text-[#3A4657] mb-8">
+                        <p className="font-retro text-base sm:text-lg text-[#3A4657] mb-8">
                             You can find me on
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <a href={`mailto:${p.email || ''}`} className="flex-1 panel-pixel flex items-center gap-4 hover:bg-[#FFD51A]/20 transition-colors group">
-                                <div className="w-12 h-12 flex items-center justify-center bg-[#EA4335] border-2 border-[#101020] shrink-0">
-                                    <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" /></svg>
+                        <div className="grid grid-cols-3 gap-2 sm:gap-4 items-stretch">
+                            <a href={`mailto:${p.email || ''}`} className="panel-pixel flex flex-col items-center justify-center text-center gap-2 p-3 sm:p-5 hover:bg-[#FFD51A]/20 transition-colors group min-h-full">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-[#EA4335] border-2 border-[#101020] shrink-0">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-white" viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" /></svg>
                                 </div>
-                                <div>
-                                    <div className="font-pixel text-[9px] text-[#105E3D] uppercase">▶ Email</div>
-                                    <div className="font-retro text-lg text-[#101020] group-hover:text-[#B45309] break-all">{p.email}</div>
-                                </div>
+                                <div className="font-pixel text-[7px] sm:text-[9px] text-[#105E3D] uppercase">▶ Email</div>
+                                <div className="font-retro text-xs sm:text-lg text-[#101020] group-hover:text-[#B45309] break-all leading-snug">{p.email}</div>
                             </a>
 
-                            <a href={p.phone_wa || '#'} target="_blank" rel="noopener noreferrer" className="flex-1 panel-pixel flex items-center gap-4 hover:bg-[#FFD51A]/20 transition-colors group">
-                                <div className="w-12 h-12 flex items-center justify-center bg-[#25D366] border-2 border-[#101020] shrink-0">
-                                    <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                            <a href={p.phone_wa || '#'} target="_blank" rel="noopener noreferrer" className="panel-pixel flex flex-col items-center justify-center text-center gap-2 p-3 sm:p-5 hover:bg-[#FFD51A]/20 transition-colors group min-h-full">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-[#25D366] border-2 border-[#101020] shrink-0">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                                 </div>
-                                <div>
-                                    <div className="font-pixel text-[9px] text-[#105E3D] uppercase">▶ WhatsApp</div>
-                                    <div className="font-retro text-lg text-[#101020] group-hover:text-[#B45309]">{p.phone}</div>
-                                </div>
+                                <div className="font-pixel text-[7px] sm:text-[9px] text-[#105E3D] uppercase">▶ WhatsApp</div>
+                                <div className="font-retro text-xs sm:text-lg text-[#101020] group-hover:text-[#B45309] break-all leading-snug">{p.phone}</div>
                             </a>
 
-                            <a href="https://instagram.com/indraokta97" target="_blank" rel="noopener noreferrer" className="flex-1 panel-pixel flex items-center gap-4 hover:bg-[#FFD51A]/20 transition-colors group">
-                                <div className="w-12 h-12 flex items-center justify-center bg-[#E4405F] border-2 border-[#101020] shrink-0">
-                                    <svg className="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
+                            <a href="https://instagram.com/indraokta97" target="_blank" rel="noopener noreferrer" className="panel-pixel flex flex-col items-center justify-center text-center gap-2 p-3 sm:p-5 hover:bg-[#FFD51A]/20 transition-colors group min-h-full">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-[#E4405F] border-2 border-[#101020] shrink-0">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
                                 </div>
-                                <div>
-                                    <div className="font-pixel text-[9px] text-[#105E3D] uppercase">▶ Instagram</div>
-                                    <div className="font-retro text-lg text-[#101020] group-hover:text-[#B45309]">@indraokta97</div>
-                                </div>
+                                <div className="font-pixel text-[7px] sm:text-[9px] text-[#105E3D] uppercase">▶ Instagram</div>
+                                <div className="font-retro text-xs sm:text-lg text-[#101020] group-hover:text-[#B45309] break-all leading-snug">@indraokta97</div>
                             </a>
                         </div>
                     </div>

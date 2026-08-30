@@ -8,15 +8,33 @@
     <meta property="og:title" content="Indra Okta's Portfolio — Indie Dev">
     <meta property="og:description" content="Events, engineering, essays. A portfolio by Indra Oktafian Hidayat.">
     <meta property="og:type" content="website">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/fav.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/fav.ico" type="image/x-icon">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap" id="fonts-css" rel="stylesheet" media="print">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        #boot-screen { position: fixed; inset: 0; z-index: 9999; background: #0b0d17; }
+    </style>
 </head>
 <body class="min-h-screen flex flex-col pixel-body">
     <div id="scroll-progress" aria-hidden="true"></div>
+    <div id="boot-screen" class="boot-screen" aria-hidden="true">
+        <div class="boot-content">
+            <div class="boot-inner">
+                <video class="boot-logo" src="/images/cm.webm" alt="CM-Indra" autoPlay loop muted playsInline></video>
+                <div class="boot-right">
+                    <div class="boot-title">INDRAOKTA97</div>
+                    <div class="loading-bar boot-loading">
+                        <div class="loading-bar-fill" id="boot-loading-fill"></div>
+                    </div>
+                    <div class="boot-status" id="boot-status">▶ LOADING...</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="app"></div>
     <script type="module" src="./resources/js/main.jsx"></script>
 </body>

@@ -461,7 +461,7 @@ body {
 }
 
 .pulse-pixel {
-    animation: pulse-pixel 1.5s steps(3) infinite;
+    animation: pulse-pixel 1.5s ease-in-out infinite;
 }
 
 /* Glitch effect */
@@ -557,7 +557,7 @@ body {
 }
 
 .bounce {
-    animation: bounce 2s steps(8) infinite;
+    animation: bounce 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 /* Shake (like damage) */
@@ -580,7 +580,7 @@ body {
 }
 
 .idle-bob {
-    animation: idle-bob 1.5s steps(4) infinite;
+    animation: idle-bob 1.5s ease-in-out infinite;
 }
 
 /* Scanline overlay (CRT effect) */
@@ -1015,16 +1015,19 @@ body {
     letter-spacing: 0.05em;
 }
 
-/* === Loading bar (game-style LOADING... text) === */
+/* === Loading screen (uniform with boot splash) === */
 .loading-screen {
     position: fixed;
     inset: 0;
-    background: var(--ink);
     z-index: 9999;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
+    background:
+        linear-gradient(rgba(28, 34, 61, 0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 34, 61, 0.6) 1px, transparent 1px),
+        radial-gradient(ellipse at center, #1b2138 0%, #0b0d17 72%);
+    background-size: 28px 28px, 28px 28px, 100% 100%;
     color: var(--c-green);
     font-family: var(--font-pixel);
 }
@@ -1032,15 +1035,55 @@ body {
 .loading-screen.fade-out {
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s ease-out;
+    transition: opacity 0.45s ease-out;
+}
+
+.loading-inner {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 22px 32px;
+    background: rgba(16, 16, 32, 0.55);
+    border: 3px solid rgba(115, 220, 87, 0.35);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.loading-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 240px;
+}
+
+.loading-logo {
+    width: auto;
+    max-width: 220px;
+    max-height: 150px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.loading-title {
+    color: var(--c-yellow);
+    font-size: 16px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.loading-status {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    animation: blink 1s steps(2) infinite;
 }
 
 .loading-bar {
-    width: 280px;
-    height: 24px;
+    width: 240px;
+    height: 16px;
     background: var(--ink);
     border: 3px solid var(--c-green);
-    margin-top: 16px;
+    margin-top: 4px;
     position: relative;
     overflow: hidden;
 }
@@ -1049,24 +1092,131 @@ body {
     height: 100%;
     background: var(--c-green);
     width: 0%;
-    transition: width 1s ease-out;
+    transition: width 1.6s linear;
 }
 
-.loading-text {
-    font-size: 14px;
+@media (max-width: 520px) {
+    .loading-inner {
+        flex-direction: column;
+        gap: 18px;
+        padding: 18px 22px;
+    }
+    .loading-right {
+        align-items: center;
+        min-width: 0;
+    }
+    .loading-logo {
+        max-width: 150px;
+        max-height: 110px;
+    }
+    .loading-bar {
+        width: 200px;
+    }
+}
+
+/* === Boot screen (game splash) === */
+.boot-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(rgba(28, 34, 61, 0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28, 34, 61, 0.6) 1px, transparent 1px),
+        radial-gradient(ellipse at center, #1b2138 0%, #0b0d17 72%);
+    background-size: 28px 28px, 28px 28px, 100% 100%;
+    font-family: var(--font-pixel);
+    color: var(--c-green);
+}
+
+.boot-screen.boot-fade {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease-out;
+}
+
+.boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+}
+
+.boot-inner {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 22px 32px;
+    background: rgba(16, 16, 32, 0.55);
+    border: 3px solid rgba(115, 220, 87, 0.35);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.boot-logo {
+    width: auto;
+    max-width: 220px;
+    max-height: 150px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    animation: boot-logo-in 0.7s steps(4) both;
+}
+
+.boot-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 240px;
+}
+
+.boot-title {
+    color: var(--c-yellow);
+    font-size: 16px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.boot-status {
+    font-size: 9px;
     letter-spacing: 0.2em;
     animation: blink 1s steps(2) infinite;
 }
 
-.loading-tips {
-    margin-top: 24px;
-    font-size: 8px;
-    color: var(--c-yellow);
-    max-width: 400px;
-    text-align: center;
-    line-height: 1.8;
-    letter-spacing: 0.1em;
-    min-height: 32px;
+.boot-loading {
+    width: 240px;
+    height: 16px;
+    margin-top: 4px;
+}
+
+.boot-loading .loading-bar-fill {
+    transition: width 1.6s linear;
+}
+
+@keyframes boot-logo-in {
+    0% { opacity: 0; transform: scale(0.7); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 520px) {
+    .boot-inner {
+        flex-direction: column;
+        gap: 18px;
+        padding: 18px 22px;
+    }
+    .boot-right {
+        align-items: center;
+        min-width: 0;
+    }
+    .boot-logo {
+        max-width: 150px;
+        max-height: 110px;
+    }
+    .boot-loading {
+        width: 200px;
+    }
 }
 
 /* === Stage progress (1/3) — final light definition at bottom of file === */
@@ -1983,16 +2133,7 @@ body {
   animation: hpFill 1s steps(20) forwards;
 }
 
-/* ---- 17. STAGE ENTRY WIPE ---- */
-@keyframes stageWipe {
-  0% { clip-path: inset(0 100% 0 0); }
-  100% { clip-path: inset(0 0 0 0); }
-}
-.stage-wipe {
-  animation: stageWipe 0.6s steps(12) forwards;
-}
-
-/* ---- 18. TEXT GLOW PULSE ---- */
+/* ---- 17. TEXT GLOW PULSE ---- */
 @keyframes textGlow {
   0%,100% { text-shadow: 2px 2px 0 var(--ink), 0 0 4px rgba(255,213,26,0.2); }
   50% { text-shadow: 2px 2px 0 var(--ink), 0 0 12px rgba(255,213,26,0.6); }
@@ -2837,6 +2978,112 @@ body {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+}
+
+.tech-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    color: #101020;
+}
+
+.tech-icon[src*="inertia-logo"] {
+    filter: drop-shadow(2px 2px 0 rgba(16, 16, 32, 0.35));
+}
+
+/* === Browser-style web frame (Words stage author pages) === */
+.web-frame {
+    border: 3px solid #101020;
+    background: #ffffff;
+    box-shadow: 4px 4px 0 rgba(16, 16, 32, 0.18);
+}
+
+.web-frame-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #101020;
+    color: #ffffff;
+}
+
+.web-frame-dots {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.web-frame-dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #F05A6E;
+    display: block;
+}
+
+.web-frame-dots i:nth-child(2) { background: #FFD51A; }
+.web-frame-dots i:nth-child(3) { background: #73DC57; }
+
+.web-frame-url {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--font-retro);
+    font-size: 14px;
+    color: #B9C7DC;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.web-frame-open {
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: #FFD51A;
+    white-space: nowrap;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.web-frame-open:hover { color: #ffffff; }
+
+.web-frame-iframe {
+    width: 100%;
+    height: 460px;
+    border: 0;
+    display: block;
+    background: #ffffff;
+}
+
+.web-frame-note {
+    padding: 10px 14px;
+    font-family: var(--font-retro);
+    font-size: 15px;
+    color: #3A4657;
+    border-top: 2px solid #101020;
+    background: #EFF4FA;
+    line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+    .web-frame-iframe { height: 360px; }
+}
+
+/* ==========================================================================
+   MOBILE — SHRINK ALL CONTENT (fonts, spacing, images) proportionally
+   Desktop (>= 768px) is untouched.
+   ========================================================================== */
+@media (max-width: 767px) {
+    #app {
+        zoom: 0.85;
+    }
+    .welcome-screen {
+        min-height: 117.65vh;
+    }
+    .welcome-bg-img {
+        height: 117.65vh !important;
+    }
 }
 
 /* ==========================================================================

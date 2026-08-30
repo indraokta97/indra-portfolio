@@ -1,5 +1,6 @@
 import AppLayout from '../Layouts/AppLayout';
 import { site } from '../data/site';
+import { getTagLogo } from '../data/logos';
 
 export default function Project({ slug }) {
     const project = site.projects.find(p => p.slug === slug) || site.projects[0];
@@ -35,6 +36,8 @@ export default function Project({ slug }) {
                 <div className="pixel-image w-full aspect-video overflow-hidden mb-10 border-[3px] border-[#101020] bg-[#101020]">
                     {project.youtube_link ? (
                         <iframe src={project.youtube_link} className="w-full h-full" frameBorder="0" allowFullScreen loading="lazy"></iframe>
+                    ) : /\.(mp4|webm|ogg)$/i.test(project.image) ? (
+                        <video src={project.image} className="w-full h-full object-cover" autoPlay loop muted playsInline poster={project.poster}></video>
                     ) : (
                         <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                     )}
@@ -45,25 +48,22 @@ export default function Project({ slug }) {
                         <span className="font-pixel text-[10px] text-[#B45309]">▶ PROJECT OVERVIEW</span>
                         <div className="flex-1 h-1 bg-[#FFD51A]"></div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         {tags.length > 0 && (
                             <div className="panel-pixel">
                                 <div className="font-pixel text-[8px] text-[#105E3D] mb-2 uppercase">▶ Stack</div>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {tags.map((tag, i) => (
-                                        <span key={i} className="badge-pixel text-[7px]">{tag.toUpperCase()}</span>
-                                    ))}
+                                <div className="flex flex-wrap gap-2.5">
+                                    {tags.map((tag, i) => {
+                                        const logo = getTagLogo(tag);
+                                        return logo ? (
+                                            <img key={i} src={logo} alt={tag} title={tag.toUpperCase()} loading="lazy" className="w-7 h-7 object-contain" style={{ filter: 'drop-shadow(2px 2px 0 rgba(0,0,0,0.25))' }} />
+                                        ) : (
+                                            <span key={i} className="font-pixel text-[7px] px-1.5 py-0.5 bg-[#027AE9] text-white border border-[#101020]">{tag.toUpperCase()}</span>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
-                        <div className="panel-pixel">
-                            <div className="font-pixel text-[8px] text-[#105E3D] mb-2 uppercase">▶ Year</div>
-                            <div className="font-retro text-lg text-[#101020]">{project.year}</div>
-                        </div>
-                        <div className="panel-pixel">
-                            <div className="font-pixel text-[8px] text-[#105E3D] mb-2 uppercase">▶ Status</div>
-                            <div className="font-retro text-lg text-[#101020]">Shipped ✓</div>
-                        </div>
                     </div>
                     {(project.link || project.github_link || project.youtube_link) && (
                         <div className="flex flex-wrap gap-3 mt-4">
@@ -81,9 +81,24 @@ export default function Project({ slug }) {
                             <div className="flex-1 h-1 bg-[#FFD51A]"></div>
                         </div>
                         <div className="panel-pixel">
-                            <div className="font-retro text-lg text-[#101020] leading-relaxed space-y-4">
+                            <div className="font-retro text-lg text-[#101020] leading-relaxed space-y-5">
                                 {project.long_description.split(/\n\s*\n/).map((p, i) => (
-                                    <p key={i}>{p}</p>
+                                    <div key={i}>
+                                        {p.split('\n').map((line, j) => {
+                                            const trimmed = line.trim();
+                                            if (trimmed.startsWith('•')) {
+                                                return (
+                                                    <div key={j} className="flex gap-2 items-start">
+                                                        <span className="text-[#027AE9] shrink-0">•</span>
+                                                        <span>{trimmed.slice(1).trim()}</span>
+                                                    </div>
+                                                );
+                                            }
+                                            return (
+                                                <div key={j} className="font-pixel text-[10px] text-[#B45309] mt-4 mb-1.5 first:mt-0 uppercase">{trimmed}</div>
+                                            );
+                                        })}
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -124,7 +139,7 @@ export default function Project({ slug }) {
                 <aside className="hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-30">
                     <div className="pixel-border bg-sky-texture p-2 flex flex-col gap-2">
                         <div className="font-pixel text-[7px] text-[#3A4657] text-center uppercase tracking-wider mb-1 px-1">Levels</div>
-                        {[{ n: 1, name: 'Code', href: '/stage/1', bg: 'bg-[#73DC57]', text: 'text-[#101020]' }, { n: 2, name: 'Events', href: '/stage/2', bg: 'bg-[#F05A6E]', text: 'text-white' }, { n: 3, name: 'Words', href: '/stage/3', bg: 'bg-[#36CFDD]', text: 'text-white' }].map(s => (
+                        {[{ n: 1, name: 'Code', href: '/stage/1', bg: 'bg-[#9CA3AF]', text: 'text-[#101020]' }, { n: 2, name: 'Events', href: '/stage/2', bg: 'bg-[#F05A6E]', text: 'text-white' }, { n: 3, name: 'Words', href: '/stage/3', bg: 'bg-[#36CFDD]', text: 'text-white' }].map(s => (
                             <a key={s.n} href={s.href} className={`group flex items-center gap-2 px-2 py-2 ${s.bg} ${s.text} hover:bg-[#FFD51A] hover:text-[#101020] transition-colors`}>
                                 <span className="font-pixel text-xs">0{s.n}</span>
                                 <span className="font-pixel text-[9px] uppercase font-bold whitespace-nowrap hidden group-hover:inline">{s.name}</span>
