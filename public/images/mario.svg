@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <style>
+    /* Walking leg animation - frames 1 and 2 of walk cycle */
+    @keyframes walk-frame-1 {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes walk-frame-2 {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* Body bob - slight up/down with each step */
+    @keyframes body-bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1px); }
+    }
+
+    /* Arm swing */
+    @keyframes arm-swing {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-1px); }
+    }
+
+    .mario-body {
+      animation: body-bob 0.4s steps(4) infinite;
+    }
+
+    .walk-frame-1 {
+      animation: walk-frame-1 0.4s steps(2) infinite;
+    }
+    .walk-frame-2 {
+      animation: walk-frame-2 0.4s steps(2) infinite;
+    }
+  </style>
+
+  <!-- Mario Body (with bob) -->
+  <g class="mario-body">
+    <!-- Frame 1: Standing/Walking pose A -->
+    <g class="walk-frame-1">
+      <!-- Hat (red) -->
+      <rect x="10" y="2" width="10" height="2" fill="#e63946"/>
+      <rect x="8" y="4" width="14" height="2" fill="#e63946"/>
+      <rect x="6" y="6" width="18" height="2" fill="#e63946"/>
+      <!-- Hat brim -->
+      <rect x="4" y="8" width="22" height="1" fill="#e63946"/>
+      <!-- Face (skin) -->
+      <rect x="10" y="9" width="10" height="3" fill="#ffb088"/>
+      <!-- Eyes -->
+      <rect x="13" y="9" width="2" height="2" fill="#0f0f1e"/>
+      <rect x="17" y="9" width="2" height="2" fill="#0f0f1e"/>
+      <!-- Mustache -->
+      <rect x="12" y="11" width="6" height="1" fill="#0f0f1e"/>
+      <!-- Body (red overalls shirt) -->
+      <rect x="8" y="12" width="14" height="6" fill="#e63946"/>
+      <!-- Arms (red) -->
+      <rect x="6" y="12" width="2" height="6" fill="#e63946"/>
+      <rect x="22" y="12" width="2" height="6" fill="#e63946"/>
+      <!-- Hands (skin) -->
+      <rect x="6" y="18" width="2" height="2" fill="#ffb088"/>
+      <rect x="22" y="18" width="2" height="2" fill="#ffb088"/>
+      <!-- Overalls (blue) -->
+      <rect x="10" y="18" width="10" height="6" fill="#4361ee"/>
+      <!-- Belt -->
+      <rect x="10" y="18" width="10" height="1" fill="#fcbf49"/>
+      <!-- Legs - Walking frame 1 (left foot forward) -->
+      <rect x="10" y="24" width="4" height="4" fill="#4361ee"/>
+      <rect x="16" y="26" width="4" height="2" fill="#4361ee"/>
+      <!-- Shoes (brown) -->
+      <rect x="9" y="27" width="5" height="2" fill="#8b5a00"/>
+      <rect x="15" y="27" width="5" height="2" fill="#8b5a00"/>
+    </g>
+
+    <!-- Frame 2: Walking pose B (right foot forward) -->
+    <g class="walk-frame-2">
+      <!-- Hat -->
+      <rect x="10" y="2" width="10" height="2" fill="#e63946"/>
+      <rect x="8" y="4" width="14" height="2" fill="#e63946"/>
+      <rect x="6" y="6" width="18" height="2" fill="#e63946"/>
+      <rect x="4" y="8" width="22" height="1" fill="#e63946"/>
+      <!-- Face -->
+      <rect x="10" y="9" width="10" height="3" fill="#ffb088"/>
+      <rect x="13" y="9" width="2" height="2" fill="#0f0f1e"/>
+      <rect x="17" y="9" width="2" height="2" fill="#0f0f1e"/>
+      <rect x="12" y="11" width="6" height="1" fill="#0f0f1e"/>
+      <!-- Body -->
+      <rect x="8" y="12" width="14" height="6" fill="#e63946"/>
+      <!-- Arms - swung slightly forward/back -->
+      <rect x="5" y="13" width="2" height="6" fill="#e63946"/>
+      <rect x="23" y="13" width="2" height="6" fill="#e63946"/>
+      <rect x="5" y="19" width="2" height="2" fill="#ffb088"/>
+      <rect x="23" y="19" width="2" height="2" fill="#ffb088"/>
+      <!-- Overalls -->
+      <rect x="10" y="18" width="10" height="6" fill="#4361ee"/>
+      <rect x="10" y="18" width="10" height="1" fill="#fcbf49"/>
+      <!-- Legs - Walking frame 2 (right foot forward) -->
+      <rect x="10" y="26" width="4" height="2" fill="#4361ee"/>
+      <rect x="16" y="24" width="4" height="4" fill="#4361ee"/>
+      <!-- Shoes -->
+      <rect x="9" y="27" width="5" height="2" fill="#8b5a00"/>
+      <rect x="15" y="27" width="5" height="2" fill="#8b5a00"/>
+    </g>
+  </g>
+</svg>

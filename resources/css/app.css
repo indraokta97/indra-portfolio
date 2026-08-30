@@ -1,0 +1,2844 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   The Indra Chronicle — PIXEL ART Design System
+   Retro 8-bit. Blocky borders. Limited palette. Game-like UI.
+   ========================================================================== */
+
+/* Color palette — LIGHT SKY-BLUE theme (editorial, bright) */
+:root {
+    /* =========================
+       BACKGROUND — LIGHT SKY
+       ========================= */
+    --bg-main: #BFE0FF;          /* soft sky-blue page background (matches bg.webp) */
+    --bg-dark: #A9D4F5;          /* slightly deeper sky-blue band */
+    --bg-surface: #FFFFFF;       /* white cards/panels */
+    --bg-surface-light: #DCF0FF; /* soft sky-blue cards */
+
+    /* =========================
+       PRIMARY — SKY
+       ========================= */
+    --primary: #027AE9;
+    --primary-light: #14B4EA;
+    --primary-soft: #7EDBF9;
+    --cyan: #36CFDD;
+
+    /* =========================
+       NATURE — LANDSCAPE
+       TWO-ROLE GREEN SYSTEM (keep consistent site-wide):
+       - LABEL/TEXT on light bg  -> #105E3D (dark forest, 4.5:1+ on sky & white)
+       - FILL/border/buttons     -> #73DC57 (bright, dark text)
+       ========================= */
+    --green-dark: #012B1F;
+    --green-forest: #105E3D;
+    --green-dark-2: #105E3D;
+    --green: #38B366;
+    --green-bright: #73DC57;
+
+    /* =========================
+       ACCENT
+       ========================= */
+    --yellow: #FFD51A;
+    --yellow-light: #FFF09A;
+    --orange: #F3A72F;
+
+    /* =========================
+       TEXT — DARK on light bg
+       ========================= */
+    --text-primary: #101020;
+    --text-secondary: #3A4657;
+    --text-muted: #55607A;
+
+    /* =========================
+       BORDERS / PIXEL UI
+       ========================= */
+    --border: #7B97B8;
+    --border-light: #A9C4E8;
+    --shadow: #101020;
+
+    /* =========================
+       STATUS
+       ========================= */
+    --success: #38B366;
+    --info: #36CFDD;
+    --warning: #FFD51A;
+    --danger: #F05A6E;
+
+    /* Backward-compat aliases (used across rules & animations) */
+    --dark: #101020;
+    --cream: #BFE0FF;
+    --bg-panel: #FFFFFF;
+    --bg-card: #DCF0FF;
+    --ink: #101020;
+    --white: #FFFFFF;
+    --c-red: #F05A6E;
+    --c-danger: #F05A6E;
+    --c-green: #73DC57;
+    --c-green-bright: #73DC57;
+    --c-blue: #027AE9;
+    --c-primary: #027AE9;
+    --c-primary-soft: #7EDBF9;
+    --c-yellow: #FFD51A;
+    --c-purple: #8B5CF6;
+    --c-pink: #EC4899;
+    --c-gold: #F3A72F;
+    --c-cream: #101020;   /* body text = dark */
+    --c-dark: #101020;
+
+    --border-pixel: 3px;
+    --shadow-pixel: 4px 4px 0 #101020;
+
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-body: 'Newsreader', Georgia, serif;
+    --font-retro: 'VT323', monospace;
+    --font-small: 'Silkscreen', monospace;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Pixel rendering only for actual pixel art images (not photos) */
+img:not(.bg-photo):not(.welcome-bg-img):not(.hero-bg-img), svg, .pixel-image, .pixel-image img, .character-sprite, .mario-sprite, .mario-sprite img, .hero-bg, .welcome-bg {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* Real photos (bg.webp) get smooth rendering */
+.welcome-bg-img, .hero-bg-img, .bg-photo {
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-retro);
+    background-color: var(--bg-main);
+    color: var(--c-cream);
+    line-height: 1.5;
+    font-size: 18px;
+    overflow-x: hidden;
+}
+
+::selection {
+    background: var(--c-yellow);
+    color: var(--ink);
+}
+
+:focus-visible {
+    outline: 3px solid var(--c-yellow);
+    outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { background: var(--c-blue); border: 2px solid var(--ink); }
+
+/* Scroll Progress */
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background: var(--c-yellow);
+    z-index: 100;
+    width: 0%;
+    transition: width 0.15s ease-out;
+    box-shadow: 0 0 8px var(--c-yellow);
+}
+
+/* Pixel Art Utility Classes */
+.font-pixel { font-family: var(--font-pixel); line-height: 1.6; }
+.font-retro { font-family: var(--font-retro); }
+.font-small-pixel { font-family: var(--font-small); }
+.font-display { font-family: var(--font-pixel); line-height: 1.4; }
+
+.pixel-border {
+    border: var(--border-pixel) solid var(--ink);
+}
+
+.pixel-border-white {
+    border: var(--border-pixel) solid var(--white);
+}
+
+.pixel-shadow {
+    box-shadow: var(--shadow-pixel);
+}
+
+.pixel-shadow-yellow {
+    box-shadow: 4px 4px 0 var(--c-yellow);
+}
+
+.pixel-shadow-green {
+    box-shadow: 4px 4px 0 var(--c-green);
+}
+
+.pixel-shadow-red {
+    box-shadow: 4px 4px 0 var(--c-red);
+}
+
+/* Button - Pixel Style */
+.btn-pixel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    background: var(--c-green);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-decoration: none;
+}
+
+.btn-pixel:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--ink);
+    background: var(--c-yellow);
+}
+
+.btn-pixel:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 var(--ink);
+}
+
+.btn-pixel-blue { background: var(--c-blue); color: var(--white); }
+.btn-pixel-red { background: var(--c-red); color: var(--white); }
+.btn-pixel-purple { background: var(--c-purple); color: var(--white); }
+
+/* Panel - Like an in-game dialog box */
+.panel-pixel {
+    background: var(--bg-panel);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 16px;
+}
+
+.panel-yellow {
+    background: var(--c-yellow);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.panel-green {
+    background: var(--c-green);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* Power-up Badge - Like collectible item */
+.badge-pixel {
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    padding: 6px 10px;
+    background: var(--c-blue);
+    color: var(--white);
+    border: 2px solid var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-red { background: var(--c-red); color: var(--white); }
+.badge-green { background: var(--c-green); color: var(--ink); }
+.badge-yellow { background: var(--c-yellow); color: var(--ink); }
+.badge-purple { background: var(--c-purple); color: var(--white); }
+
+/* HP Bar / Progress */
+.hp-bar {
+    height: 16px;
+    background: var(--ink);
+    border: 2px solid var(--white);
+    position: relative;
+    overflow: hidden;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    background: var(--c-green);
+    transition: width 0.5s ease-out;
+}
+
+/* Nav active underline */
+.nav-link {
+    position: relative;
+}
+
+.nav-link.is-active {
+    color: var(--c-yellow);
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 3px;
+    background: var(--c-yellow);
+    transform: scaleX(0);
+    transition: transform 0.2s ease-out;
+}
+
+.nav-link:hover::after,
+.nav-link.is-active::after {
+    transform: scaleX(1);
+}
+
+/* Back to top */
+.back-to-top {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-yellow);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.back-to-top[hidden] { display: none; }
+
+.back-to-top:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    background: var(--c-yellow);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 10px 16px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: toastIn 0.3s ease-out;
+}
+
+@keyframes toastIn {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Pixel art hover effect on cards */
+.pixel-card {
+    background: var(--bg-panel);
+    border: 3px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: all 0.2s ease-out;
+    position: relative;
+}
+
+.pixel-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--c-yellow);
+}
+
+/* Pixel image frame */
+.pixel-image {
+    border: 3px solid var(--ink);
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    background: var(--bg-panel);
+    display: block;
+}
+
+/* Stat block - Game-style stat display */
+.stat-block {
+    background: var(--ink);
+    border: 3px solid var(--c-green);
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-number {
+    font-family: var(--font-pixel);
+    font-size: 28px;
+    color: var(--c-yellow);
+    line-height: 1;
+    text-shadow: 2px 2px 0 var(--c-red);
+}
+
+.stat-label {
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--white);
+    text-transform: uppercase;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+}
+
+/* Section divider - pixel rule */
+.pixel-divider {
+    height: 6px;
+    background:
+        repeating-linear-gradient(90deg,
+            var(--ink) 0,
+            var(--ink) 8px,
+            transparent 8px,
+            transparent 12px);
+    margin: 24px 0;
+}
+
+/* Header banner style */
+.pixel-banner {
+    background: var(--ink);
+    border-top: 4px solid var(--c-green);
+    border-bottom: 4px solid var(--c-green);
+    padding: 8px 0;
+    text-align: center;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: var(--c-green);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* Blink animation for terminal */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+    animation: blink 1s steps(2) infinite;
+}
+
+/* Float animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.float-anim {
+    animation: float 2s ease-in-out infinite;
+}
+
+/* Pulse for important elements */
+@keyframes pulse-pixel {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.pulse-pixel {
+    animation: pulse-pixel 1.5s steps(3) infinite;
+}
+
+/* Glitch effect */
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-1px, 1px); }
+    40% { transform: translate(-1px, -1px); }
+    60% { transform: translate(1px, 1px); }
+    80% { transform: translate(1px, -1px); }
+    100% { transform: translate(0); }
+}
+
+.glitch-hover:hover {
+    animation: glitch 0.3s steps(5) infinite;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Line clamps for retro feel */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   GAME-STYLE ANIMATIONS
+   ========================================================================== */
+
+/* Pixel-perfect step animations (no smooth easing) */
+
+/* Coin spin (8-bit coin flip) */
+@keyframes coin-spin {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(0.1); }
+    100% { transform: scaleX(1); }
+}
+
+.coin-spin {
+    animation: coin-spin 1.2s steps(4) infinite;
+    transform-origin: center;
+    display: inline-block;
+}
+
+/* Star twinkle */
+@keyframes star-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+.star-twinkle {
+    animation: star-twinkle 1.2s steps(3) infinite;
+}
+
+/* Heart beat */
+@keyframes heart-beat {
+    0%, 100% { transform: scale(1); }
+    20% { transform: scale(1.2); }
+    40% { transform: scale(0.95); }
+    60% { transform: scale(1.1); }
+    80% { transform: scale(1); }
+}
+
+.heart-beat {
+    animation: heart-beat 1.5s steps(5) infinite;
+    display: inline-block;
+    transform-origin: center;
+}
+
+/* Bounce (like Mario) */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    10% { transform: translateY(-8px); }
+    20% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+    40% { transform: translateY(0); }
+    50%, 100% { transform: translateY(0); }
+}
+
+.bounce {
+    animation: bounce 2s steps(8) infinite;
+}
+
+/* Shake (like damage) */
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-1px, 1px); }
+    40% { transform: translate(-1px, -1px); }
+    60% { transform: translate(1px, 1px); }
+    80% { transform: translate(1px, -1px); }
+}
+
+.shake-hover:hover {
+    animation: shake 0.3s steps(5) infinite;
+}
+
+/* Idle bob */
+@keyframes idle-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.idle-bob {
+    animation: idle-bob 1.5s steps(4) infinite;
+}
+
+/* Scanline overlay (CRT effect) */
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.scanline-overlay {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanline-overlay::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.04) 50%,
+        transparent 100%);
+    height: 20px;
+    pointer-events: none;
+    animation: scanline 4s linear infinite;
+}
+
+/* Press start blink */
+@keyframes press-start-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.2; }
+}
+
+.blink-slow {
+    animation: press-start-blink 1.5s steps(2) infinite;
+}
+
+.blink-fast {
+    animation: press-start-blink 0.6s steps(2) infinite;
+}
+
+/* Pixel spark burst */
+@keyframes spark-burst {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: scale(1.5) rotate(45deg); opacity: 0; }
+}
+
+.spark {
+    animation: spark-burst 0.8s steps(4) infinite;
+    display: inline-block;
+}
+
+/* Power up glow */
+@keyframes power-glow {
+    0%, 100% { box-shadow: 4px 4px 0 #05050D; }
+    50% { box-shadow: 4px 4px 0 #05050D, 0 0 12px #FFD51A; }
+}
+
+.power-glow {
+    animation: power-glow 2s steps(2) infinite;
+}
+
+/* Slide in from side (like entering screen) */
+@keyframes slide-in-left {
+    0% { transform: translateX(-100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in-left {
+    animation: slide-in-left 0.5s ease-out both;
+}
+
+@keyframes slide-in-right {
+    0% { transform: translateX(100%); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+.slide-in-right {
+    animation: slide-in-right 0.5s ease-out both;
+}
+
+@keyframes slide-in-up {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in-up {
+    animation: slide-in-up 0.4s ease-out both;
+}
+
+/* Flicker (broken neon sign) */
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+    20%, 22%, 24%, 55% { opacity: 0.4; }
+}
+
+.flicker {
+    animation: flicker 3s linear infinite;
+}
+
+/* Color cycle (game select) */
+@keyframes color-cycle {
+    0% { color: #73DC57; }
+    25% { color: #FFD51A; }
+    50% { color: #F05A6E; }
+    75% { color: #027AE9; }
+    100% { color: #73DC57; }
+}
+
+.color-cycle {
+    animation: color-cycle 3s steps(4) infinite;
+}
+
+/* ==========================================================================
+   BOX-BREAK CHARACTER ANIMATION
+   Character walks to box, jumps, breaks it, then navigates
+   ========================================================================== */
+
+@keyframes box-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px) rotate(-2deg); }
+    40% { transform: translateX(4px) rotate(2deg); }
+    60% { transform: translateX(-3px) rotate(-1deg); }
+    80% { transform: translateX(3px) rotate(1deg); }
+}
+
+@keyframes box-break {
+    0% { transform: scale(1); opacity: 1; }
+    30% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.3) rotate(15deg); opacity: 0; }
+}
+
+@keyframes box-pieces {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) rotate(var(--tr)); opacity: 0; }
+}
+
+.box-broken {
+    animation: box-shake 0.15s ease-in, box-break 0.3s ease-out forwards;
+}
+
+.box-broken::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    border: inherit;
+    animation: box-break 0.3s ease-out forwards;
+    pointer-events: none;
+}
+
+.stage-box {
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    cursor: pointer;
+}
+
+.stage-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 0 var(--c-green);
+}
+
+.stage-box:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--c-green);
+}
+
+
+/* ==========================================================================
+   MARIO WALKING ANIMATION
+   Real 8-bit Mario walks across the bottom of the stage select
+   ========================================================================== */
+
+@keyframes mario-walk {
+    0% {
+        left: -60px;
+    }
+    100% {
+        left: calc(100% + 60px);
+    }
+}
+
+.mario-walker {
+    animation: mario-walk 8s steps(60) infinite;
+    z-index: 5;
+}
+
+.mario-sprite {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+    /* Slight up-down bob as he walks */
+    animation: mario-bob 0.4s steps(4) infinite;
+}
+
+@keyframes mario-bob {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+/* Mario zone (the ground area) */
+.mario-zone {
+    background: linear-gradient(180deg, transparent 0%, rgba(6, 214, 160, 0.03) 100%);
+    position: relative;
+}
+
+/* ==========================================================================
+   PRO MAX GAME EXPERIENCE - Pro Game UI Components
+   ========================================================================== */
+
+/* === CRT / Retro TV Effect === */
+.crt-screen {
+    position: relative;
+    overflow: hidden;
+}
+
+.crt-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.1) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.3;
+}
+
+.crt-screen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    z-index: 99;
+}
+
+/* === Animated starfield background === */
+@keyframes star-drift {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50px); }
+}
+
+.starfield {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #BFE0FF, transparent),
+        radial-gradient(1px 1px at 40px 70px, #FFD51A, transparent),
+        radial-gradient(1.5px 1.5px at 90px 40px, #73DC57, transparent),
+        radial-gradient(1px 1px at 130px 80px, #BFE0FF, transparent),
+        radial-gradient(2px 2px at 160px 30px, #7EDBF9, transparent);
+    background-size: 200px 100px;
+    background-repeat: repeat;
+    animation: star-drift 20s linear infinite;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* === Screen shake (when boss appears or hit) === */
+@keyframes screen-shake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-4px, 2px); }
+    20% { transform: translate(4px, -2px); }
+    30% { transform: translate(-3px, 3px); }
+    40% { transform: translate(3px, -3px); }
+    50% { transform: translate(-2px, 2px); }
+    60% { transform: translate(2px, -1px); }
+    70% { transform: translate(-1px, 1px); }
+    80% { transform: translate(1px, -1px); }
+    90% { transform: translate(0, 0); }
+}
+
+.screen-shake {
+    animation: screen-shake 0.5s ease-out;
+}
+
+/* === Boss card with HP bar === */
+.boss-card {
+    position: relative;
+    background: var(--bg-panel);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    padding: 16px;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+}
+
+.boss-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.03) 50%,
+        transparent 60%,
+        transparent 100%);
+    pointer-events: none;
+}
+
+.boss-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--c-yellow);
+}
+
+/* === Level boss header === */
+.boss-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--ink);
+    border: 3px solid var(--ink);
+    margin: -16px -16px 12px -16px;
+    position: relative;
+    z-index: 2;
+}
+
+.boss-portrait {
+    width: 64px;
+    height: 64px;
+    background: var(--bg-main);
+    border: 3px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.boss-portrait::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.2) 100%);
+    pointer-events: none;
+}
+
+/* === Boss name plate === */
+.boss-nameplate {
+    flex: 1;
+    margin: 0 12px;
+}
+
+.boss-level {
+    display: inline-block;
+    background: var(--c-yellow);
+    color: var(--ink);
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    padding: 2px 6px;
+    border: 2px solid var(--ink);
+    margin-bottom: 4px;
+}
+
+.boss-name {
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.boss-title {
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--c-yellow);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* === HP bar with segments (like final fantasy) === */
+.hp-segments {
+    display: flex;
+    gap: 2px;
+    height: 8px;
+    margin-top: 4px;
+}
+
+.hp-segment {
+    flex: 1;
+    background: var(--c-green);
+    border: 1px solid var(--ink);
+    transition: background 0.2s ease-out;
+}
+
+.hp-segment.lost {
+    background: var(--ink);
+}
+
+.hp-segment.warning {
+    background: var(--c-yellow);
+}
+
+.hp-segment.danger {
+    background: var(--c-red);
+}
+
+/* === Lock icon === */
+.lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    font-size: 48px;
+    backdrop-filter: blur(2px);
+}
+
+/* === Achievement badge === */
+.achievement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--c-gold);
+    color: var(--ink);
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    padding: 4px 8px;
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* === Loading bar (game-style LOADING... text) === */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-green);
+    font-family: var(--font-pixel);
+}
+
+.loading-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+}
+
+.loading-bar {
+    width: 280px;
+    height: 24px;
+    background: var(--ink);
+    border: 3px solid var(--c-green);
+    margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    background: var(--c-green);
+    width: 0%;
+    transition: width 1s ease-out;
+}
+
+.loading-text {
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    animation: blink 1s steps(2) infinite;
+}
+
+.loading-tips {
+    margin-top: 24px;
+    font-size: 8px;
+    color: var(--c-yellow);
+    max-width: 400px;
+    text-align: center;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    min-height: 32px;
+}
+
+/* === Stage progress (1/3) — final light definition at bottom of file === */
+.stage-pip {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--c-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    color: var(--c-green);
+    font-size: 9px;
+}
+
+.stage-pip.current {
+    background: var(--c-yellow);
+    color: var(--ink);
+    border-color: var(--c-yellow);
+    animation: pulse-pixel 1.5s steps(3) infinite;
+}
+
+.stage-pip.completed {
+    background: var(--c-green);
+    color: var(--ink);
+}
+
+.stage-pip-line {
+    width: 32px;
+    height: 2px;
+    background: var(--c-green);
+    opacity: 0.5;
+}
+
+.stage-pip-line.completed {
+    background: var(--c-yellow);
+    opacity: 1;
+}
+
+/* === Achievement popup === */
+.achievement-popup {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    z-index: 200;
+    background: var(--ink);
+    border: 3px solid var(--c-gold);
+    box-shadow: 4px 4px 0 var(--ink);
+    padding: 12px 16px;
+    color: var(--white);
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    max-width: 320px;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.achievement-popup.show {
+    transform: translateX(0);
+}
+
+.achievement-popup .ach-title {
+    color: var(--c-gold);
+    font-size: 10px;
+    margin-bottom: 4px;
+}
+
+.achievement-popup .ach-desc {
+    color: var(--c-yellow);
+    font-size: 8px;
+    line-height: 1.4;
+}
+
+/* === Lives counter === */
+.lives-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.life-icon {
+    width: 12px;
+    height: 12px;
+    background: var(--c-red);
+    clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 75%, 20% 100%, 0% 35%);
+    display: inline-block;
+}
+
+/* === Coin counter === */
+.coin-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: var(--c-yellow);
+}
+
+.coin-icon {
+    width: 14px;
+    height: 14px;
+    background: var(--c-gold);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+}
+
+.coin-icon::after {
+    content: "$";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--ink);
+    font-weight: bold;
+}
+
+/* === Boss warning flash === */
+@keyframes boss-flash {
+    0%, 100% { background: var(--bg-panel); }
+    50% { background: rgba(255, 213, 26, 0.15); }
+}
+
+.boss-flash {
+    animation: boss-flash 0.6s steps(3) 3;
+}
+
+/* === Difficulty stars === */
+.difficulty-stars {
+    color: var(--c-yellow);
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.difficulty-stars .empty {
+    color: var(--ink);
+}
+
+/* === Achievement toast (better than before) === */
+.achievement-toast {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    z-index: 200;
+    background: linear-gradient(180deg, #BFE0FF 0%, #A9D4F5 100%);
+    border: 3px solid var(--c-gold);
+    box-shadow: 0 0 20px rgba(243, 167, 47, 0.5), 4px 4px 0 var(--ink);
+    padding: 14px 18px;
+    color: var(--white);
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    min-width: 300px;
+    max-width: 360px;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.achievement-toast.show {
+    transform: translateX(0);
+}
+
+.achievement-toast .ach-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--c-gold);
+    font-size: 10px;
+    margin-bottom: 6px;
+}
+
+.achievement-toast .ach-icon {
+    font-size: 20px;
+}
+
+.achievement-toast .ach-name {
+    color: var(--c-yellow);
+    font-size: 11px;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.achievement-toast .ach-desc {
+    color: var(--c-green);
+    font-size: 8px;
+    line-height: 1.4;
+}
+
+/* === Game cartridge style header === */
+.game-cartridge {
+    background: var(--ink);
+    border: 4px solid var(--c-green);
+    border-radius: 24px 24px 0 0;
+    padding: 16px 24px;
+    position: relative;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+.game-cartridge::before {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 8px;
+    background: var(--c-green);
+    border-radius: 0 0 8px 8px;
+}
+
+.game-cartridge::after {
+    content: "";
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30%;
+    height: 4px;
+    background: var(--ink);
+}
+
+/* === Parallax layers === */
+.parallax-back {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+@keyframes parallax-drift-slow {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes parallax-drift-fast {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 200%;
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.parallax-layer.slow {
+    animation: parallax-drift-slow 60s linear infinite;
+}
+
+.parallax-layer.fast {
+    animation: parallax-drift-fast 20s linear infinite;
+}
+
+/* === Selected/Active state for cards === */
+.boss-card.is-selected {
+    border-color: var(--c-yellow);
+    box-shadow: 6px 6px 0 var(--c-yellow), 0 0 30px rgba(255, 213, 26, 0.4);
+}
+
+/* === Card locked state === */
+.boss-card.is-locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.boss-card.is-locked:hover {
+    transform: none;
+    box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* === Power-up effect on card (rotation) === */
+@keyframes card-power-rotate {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(2deg) scale(1.02); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+.card-power {
+    animation: card-power-rotate 2s steps(4) infinite;
+}
+
+/* === Stagger entry for cards === */
+@keyframes card-enter {
+    0% { transform: translateY(40px) scale(0.8); opacity: 0; }
+    60% { transform: translateY(-5px) scale(1.05); opacity: 1; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.card-enter {
+    animation: card-enter 0.6s ease-out both;
+}
+
+/* === Typewriter text === */
+@keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 3px solid var(--c-yellow);
+    animation: typewriter 1.5s steps(20) 0.5s both;
+}
+
+/* === Achievement celebration confetti === */
+@keyframes confetti-fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.confetti-piece {
+    position: fixed;
+    top: -20px;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 150;
+    animation: confetti-fall 3s ease-out forwards;
+}
+
+/* === Pro game button enhancements === */
+.btn-pixel {
+    position: relative;
+    transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-pixel::before {
+    content: "▶";
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.btn-pixel:hover::before {
+    opacity: 1;
+    margin-right: 4px;
+}
+
+.btn-pixel:hover::after {
+    content: "◀";
+    margin-left: 4px;
+}
+
+/* === Power meter on button === */
+.btn-power {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-power::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent);
+    transition: left 0.4s;
+}
+
+.btn-power:hover::before {
+    left: 100%;
+}
+
+@keyframes shortcuts-slide-in {
+    0% { transform: translateY(-50%) translateX(120%); opacity: 0; }
+    100% { transform: translateY(-50%) translateX(0); opacity: 1; }
+}
+
+aside.fixed.right-4.top-1\/2 {
+    animation: shortcuts-slide-in 0.4s ease-out 0.5s both;
+}
+
+/* ==========================================================================
+   FLOATING CONTACT CHARACTER (bottom right)
+   ========================================================================== */
+
+#contact-character {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.2s ease-out;
+    filter: drop-shadow(4px 4px 0 #05050D);
+}
+
+#contact-character:hover {
+    transform: translateY(-3px) scale(1.05);
+    filter: drop-shadow(6px 6px 0 #05050D) drop-shadow(0 0 12px rgba(255, 214, 10, 0.4));
+}
+
+#contact-character:hover > div > div:first-child {
+    background: #BFE0FF;
+}
+
+/* Speech bubble above character - small attention-getter */
+#contact-character::before {
+    content: "▶";
+    position: absolute;
+    top: -8px;
+    right: 0;
+    color: #FFD51A;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    animation: cursor-blink 1.5s steps(2) infinite;
+}
+
+/* ==========================================================================
+   GAME HUD (header bar)
+   ========================================================================== */
+
+.life-icon {
+    width: 10px;
+    height: 10px;
+    background: var(--c-red);
+    clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 75%, 20% 100%, 0% 35%);
+    display: inline-block;
+}
+
+.coin-icon {
+    width: 12px;
+    height: 12px;
+    background: var(--c-gold);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    animation: coin-spin 1.5s steps(4) infinite;
+}
+
+.coin-icon::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: var(--c-yellow);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.coin-counter {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: var(--c-gold);
+}
+
+.coin-counter #coin-count {
+    min-width: 24px;
+    text-align: left;
+    text-shadow: 1px 1px 0 var(--ink);
+}
+
+.lives-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* Achievements button hover */
+#achievements-btn {
+    transition: all 0.15s ease-out;
+}
+
+#achievements-btn:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 6px var(--c-gold);
+}
+
+/* Achievements modal entry */
+#achievements-modal {
+    animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+    0% { opacity: 0; backdrop-filter: blur(0); }
+    100% { opacity: 1; backdrop-filter: blur(4px); }
+}
+
+#achievements-modal > div {
+    animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScale {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ==========================================================================
+   WELCOME SCREEN - bg.webp background
+   ========================================================================== */
+
+.welcome-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    overflow: hidden;
+    background-color: #BFE0FF;
+}
+
+.welcome-bg-img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    z-index: 0 !important;
+}
+
+.welcome-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/bg.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+.welcome-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at center, transparent 30%, rgba(22, 78, 99, 0.25) 100%),
+        linear-gradient(180deg, rgba(22, 78, 99, 0.25) 0%, rgba(12, 74, 110, 0.35) 100%);
+    z-index: 1;
+}
+
+.welcome-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0) 0px,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0.05) 2px,
+            rgba(0, 0, 0, 0.05) 4px);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* ==========================================================================
+   HERO SECTION - On the portfolio page (after welcome)
+   ========================================================================== */
+
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    background: #BFE0FF;
+}
+
+.hero-bg-img {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    opacity: 0.25 !important;
+    z-index: 0 !important;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/bg.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.25;
+    z-index: 0;
+}
+
+.bg-sky-texture {
+    background-image: url('/images/bg-sky.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: repeat;
+    background-attachment: fixed;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+        rgba(169, 212, 245, 0.85) 0%,
+        rgba(169, 212, 245, 0.92) 100%);
+    z-index: 1;
+}
+
+/* ==========================================================================
+   REVISED COLOR PALETTE - Tied to bg.webp
+   ========================================================================== */
+
+/* All panels and cards now use slightly transparent bg so bg shows through */
+.panel-pixel {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid #101020;
+    box-shadow: 4px 4px 0 #101020;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+}
+
+.pixel-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid #101020;
+    box-shadow: 4px 4px 0 #101020;
+    transition: all 0.2s ease-out;
+    position: relative;
+    backdrop-filter: blur(2px);
+}
+
+.pixel-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #FFD51A;
+}
+
+/* Body bg fallback - matches bg.webp tone */
+body {
+    background-color: #BFE0FF;
+}
+
+/* Make sure panels have better contrast on bg */
+.stage-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    color: #105E3D;
+    padding: 8px;
+    border: 2px solid #105E3D;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* Make sure character has a glow on welcome */
+.welcome-screen .bounce {
+    filter: drop-shadow(0 0 20px rgba(255, 213, 26, 0.3));
+}
+
+
+/* ==== Game-style Animations ==== */
+
+@keyframes fadeInUp {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes pulse {
+  0% {transform: scale(1);}
+  50% {transform: scale(1.05);}
+  100% {transform: scale(1);}
+}
+
+@keyframes glitch {
+  0% {clip: rect(0,9999px,0,0);}
+  20% {clip: rect(10px,9999px,30px,0);}
+  40% {clip: rect(5px,9999px,25px,0);}
+  60% {clip: rect(15px,9999px,35px,0);}
+  80% {clip: rect(0,9999px,20px,0);}
+  100% {clip: rect(0,0,0,0);}
+}
+
+/* Utility classes */
+.anim-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.anim-pulse:hover {
+  animation: pulse 0.2s ease-out;
+}
+
+.anim-glitch {
+  animation: glitch 2s steps(5) infinite;
+}
+
+/* ============================================================
+   GAME-FEEL ANIMATIONS — Real game interactivity & feedback
+   ============================================================ */
+
+/* ---- 1. SCREEN SHAKE ---- */
+@keyframes shake {
+  0%,100% { transform: translate(0); }
+  10% { transform: translate(-3px, 2px); }
+  20% { transform: translate(3px, -1px); }
+  30% { transform: translate(-2px, 3px); }
+  40% { transform: translate(2px, -2px); }
+  50% { transform: translate(-3px, 1px); }
+  60% { transform: translate(3px, 2px); }
+  70% { transform: translate(-1px, -3px); }
+  80% { transform: translate(2px, 1px); }
+  90% { transform: translate(-2px, -1px); }
+}
+.shake {
+  animation: shake 0.35s ease-in-out;
+}
+
+/* ---- 2. TYPEWRITER ---- */
+@keyframes typewriter-cursor {
+  50% { border-color: transparent; }
+}
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid var(--c-yellow);
+  width: 0;
+  animation: typewriter-expand 2s steps(30) forwards,
+             typewriter-cursor 0.75s step-end infinite;
+}
+@keyframes typewriter-expand {
+  to { width: 100%; }
+}
+
+/* ---- 3. LEVEL-UP FLASH ---- */
+@keyframes levelUpFlash {
+  0% { opacity: 0; }
+  15% { opacity: 1; background: rgba(255,213,26,0.5); }
+  30% { opacity: 0; }
+  45% { opacity: 1; background: rgba(255,255,255,0.7); }
+  100% { opacity: 0; }
+}
+.level-up-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: levelUpFlash 0.8s ease-out forwards;
+}
+
+/* ---- 4. FLOATING PARTICLES ---- */
+@keyframes particleFloat {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
+  50% { transform: translateY(-40px) translateX(15px) scale(1.2); opacity: 0.4; }
+  100% { transform: translateY(-80px) translateX(-10px) scale(0.6); opacity: 0; }
+}
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--c-yellow);
+  pointer-events: none;
+  animation: particleFloat 2s ease-out forwards;
+  image-rendering: pixelated;
+}
+.particle.green { background: var(--c-green-bright); }
+.particle.blue { background: var(--c-primary); }
+.particle.red { background: var(--c-red); }
+.particle.cyan { background: var(--info); }
+
+/* ---- 5. CHARACTER IDLE BLINK ---- */
+@keyframes idleBlink {
+  0%,92%,100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+.idle-blink {
+  animation: idleBlink 4s ease-in-out infinite;
+}
+
+/* ---- 6. CRT SCANLINE OVERLAY (full-page) ---- */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ---- 7. COIN SPIN ---- */
+@keyframes coinSpin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+.coin-spin {
+  display: inline-block;
+  animation: coinSpin 1.5s steps(8) infinite;
+}
+
+/* ---- 8. DITHERING PATTERN OVERLAY ---- */
+@keyframes ditherShift {
+  0% { background-position: 0 0; }
+  100% { background-position: 8px 8px; }
+}
+.dither-overlay {
+  position: relative;
+}
+.dither-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='0' y='0' width='2' height='2' fill='%23101020'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23101020'/%3E%3C/svg%3E");
+  background-size: 8px 8px;
+  animation: ditherShift 3s linear infinite;
+}
+
+/* ---- 9. BOSS INTRO ---- */
+@keyframes bossIntro {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  50% { transform: scale(1.15) rotate(3deg); opacity: 1; }
+  70% { transform: scale(0.95) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.boss-intro {
+  animation: bossIntro 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ---- 10. VICTORY / XP POPUP ---- */
+@keyframes xpPopup {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  80% { transform: translateY(-40px) scale(1.3); opacity: 0.7; }
+  100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+}
+.xp-popup {
+  position: absolute;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--c-yellow);
+  text-shadow: 2px 2px 0 var(--ink);
+  pointer-events: none;
+  animation: xpPopup 1.2s ease-out forwards;
+}
+
+/* ---- 11. POWER-UP GLOW PULSE ---- */
+@keyframes powerGlow {
+  0%,100% { box-shadow: 0 0 8px rgba(255,213,26,0.3), 4px 4px 0 var(--ink); }
+  50% { box-shadow: 0 0 24px rgba(255,213,26,0.7), 4px 4px 0 var(--ink); }
+}
+.power-glow {
+  animation: powerGlow 2s ease-in-out infinite;
+}
+
+/* ---- 12. SLIDE IN LEFT / RIGHT ---- */
+@keyframes slideInLeft {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+}
+.slide-in-right {
+  animation: slideInRight 0.5s ease-out forwards;
+}
+
+/* ---- 13. PIXEL RAIN (ambient background) ---- */
+@keyframes pixelRain {
+  0% { transform: translateY(-10px); opacity: 0; }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+.pixel-rain-drop {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  background: var(--c-primary-soft);
+  pointer-events: none;
+  z-index: 0;
+  image-rendering: pixelated;
+  animation: pixelRain linear infinite;
+}
+
+/* ---- 14. DAMAGE FLASH (for red elements) ---- */
+@keyframes damageFlash {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.8) saturate(1.5); }
+}
+.damage-flash {
+  animation: damageFlash 0.15s ease-out 3;
+}
+
+/* ---- 15. MENU HOVER BOUNCE ---- */
+@keyframes menuBounce {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(6px); }
+  60% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+.menu-hover:hover {
+  animation: menuBounce 0.3s ease-out;
+  color: var(--c-yellow) !important;
+}
+
+/* ---- 16. HP BAR FILL ANIMATION ---- */
+@keyframes hpFill {
+  from { width: 0; }
+}
+.hp-fill-animated {
+  animation: hpFill 1s steps(20) forwards;
+}
+
+/* ---- 17. STAGE ENTRY WIPE ---- */
+@keyframes stageWipe {
+  0% { clip-path: inset(0 100% 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+.stage-wipe {
+  animation: stageWipe 0.6s steps(12) forwards;
+}
+
+/* ---- 18. TEXT GLOW PULSE ---- */
+@keyframes textGlow {
+  0%,100% { text-shadow: 2px 2px 0 var(--ink), 0 0 4px rgba(255,213,26,0.2); }
+  50% { text-shadow: 2px 2px 0 var(--ink), 0 0 12px rgba(255,213,26,0.6); }
+}
+.text-glow {
+  animation: textGlow 2s ease-in-out infinite;
+}
+
+/* ---- 19. RETRO CURSOR BLINK ---- */
+@keyframes retroBlink {
+  0%,49% { opacity: 1; }
+  50%,100% { opacity: 0; }
+}
+.retro-cursor::after {
+  content: "_";
+  animation: retroBlink 1s step-end infinite;
+}
+
+/* ---- 20. CONFETTI / SPARKLE ---- */
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--c-yellow);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  pointer-events: none;
+  animation: sparkle 0.8s ease-out forwards;
+}
+
+/* ---- 21. WALK CYCLE (for character sprite) ---- */
+@keyframes walkCycle {
+  0%,100% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }
+  75% { transform: translateY(1px); }
+}
+.walk-cycle {
+  animation: walkCycle 0.4s steps(4) infinite;
+}
+
+/* ---- 22. NOTIFICATION POP ---- */
+@keyframes notifPop {
+  0% { transform: translateY(20px) scale(0.8); opacity: 0; }
+  60% { transform: translateY(-5px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.notif-pop {
+  animation: notifPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ---- 23. BORDER GLOW (for active elements) ---- */
+@keyframes borderGlow {
+  0%,100% { border-color: var(--ink); }
+  50% { border-color: var(--c-yellow); }
+}
+.border-glow {
+  animation: borderGlow 1.5s ease-in-out infinite;
+}
+
+/* ---- 24. SCREEN TRANSITION OVERLAY ---- */
+@keyframes screenWipeDown {
+  0% { transform: translateY(-100%); }
+  45% { transform: translateY(0); }
+  55% { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+.screen-transition {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  z-index: 10000;
+  pointer-events: none;
+  animation: screenWipeDown 0.8s steps(10) forwards;
+}
+
+/* ---- 25. IDLE FLOAT ---- */
+@keyframes idleFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.idle-float {
+    animation: idleFloat 3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   WORLD MAP — Interactive Overworld Navigation
+   ========================================================================== */
+
+.world-map {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    aspect-ratio: 16 / 10;
+    background:
+        repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(16,94,61,0.08) 19px, rgba(16,94,61,0.08) 20px),
+        repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(16,94,61,0.08) 19px, rgba(16,94,61,0.08) 20px),
+        linear-gradient(180deg, #7EDBF9 0%, #BFE0FF 40%, #a3d9a5 60%, #7DC57D 100%);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+/* Pixel clouds */
+.world-map::before {
+    content: "";
+    position: absolute;
+    top: 8%;
+    left: 0;
+    width: 200%;
+    height: 24px;
+    background:
+        radial-gradient(circle 12px at 60px 12px, #fff 90%, transparent),
+        radial-gradient(circle 8px at 48px 12px, #fff 90%, transparent),
+        radial-gradient(circle 14px at 30px 12px, #fff 90%, transparent),
+        radial-gradient(circle 10px at 80px 12px, #fff 90%, transparent),
+        radial-gradient(circle 16px at 180px 12px, #fff 90%, transparent),
+        radial-gradient(circle 10px at 168px 12px, #fff 90%, transparent),
+        radial-gradient(circle 12px at 260px 12px, #fff 90%, transparent),
+        radial-gradient(circle 8px at 248px 12px, #fff 90%, transparent),
+        radial-gradient(circle 14px at 340px 12px, #fff 90%, transparent),
+        radial-gradient(circle 10px at 328px 12px, #fff 90%, transparent);
+    animation: cloudDrift 40s linear infinite;
+    opacity: 0.7;
+    z-index: 1;
+}
+
+@keyframes cloudDrift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Pixel mountains background */
+.world-map::after {
+    content: "";
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background:
+        linear-gradient(135deg, transparent 33%, #5a8f5a 33%, #5a8f5a 66%, transparent 66%),
+        linear-gradient(225deg, transparent 33%, #5a8f5a 33%, #5a8f5a 66%, transparent 66%);
+    background-size: 120px 80px, 120px 80px;
+    background-position: 0 0, 60px 0;
+    opacity: 0.3;
+    z-index: 0;
+}
+
+/* Path between nodes */
+.map-path {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(90deg, #c9a96e 0, #c9a96e 8px, transparent 8px, transparent 14px);
+    transform: translateY(-50%);
+    z-index: 2;
+    opacity: 0.7;
+}
+
+.map-path.completed {
+    background: repeating-linear-gradient(90deg, #FFD51A 0, #FFD51A 8px, transparent 8px, transparent 14px);
+    opacity: 1;
+}
+
+/* Map node (stage location) */
+.map-node {
+    position: absolute;
+    z-index: 10;
+    cursor: pointer;
+    transition: transform 0.15s ease-out;
+}
+
+.map-node:hover {
+    transform: scale(1.08);
+}
+
+.map-node.current .map-node-marker {
+    animation: nodePulse 1.5s steps(4) infinite;
+}
+
+@keyframes nodePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,213,26,0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(255,213,26,0); }
+}
+
+.map-node-marker {
+    width: 52px;
+    height: 52px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    position: relative;
+    image-rendering: pixelated;
+    transition: box-shadow 0.2s;
+}
+
+.map-node:hover .map-node-marker {
+    box-shadow: 4px 4px 0 var(--c-yellow), 0 0 16px rgba(255,213,26,0.3);
+}
+
+.map-node.completed .map-node-marker {
+    background: var(--c-green);
+}
+
+.map-node.locked .map-node-marker {
+    background: var(--ink);
+    opacity: 0.5;
+    filter: grayscale(1);
+}
+
+.map-node.locked {
+    cursor: not-allowed;
+}
+
+/* Node label */
+.map-node-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 6px;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--ink);
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-align: center;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
+}
+
+.map-node.current .map-node-label {
+    color: var(--c-yellow);
+    text-shadow: 1px 1px 0 var(--ink);
+}
+
+/* Player character on map */
+.map-player {
+    position: absolute;
+    z-index: 20;
+    width: 48px;
+    height: 48px;
+    transition: left 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+    pointer-events: none;
+}
+
+.map-player img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.map-player.walking {
+    animation: walkCycle 0.3s steps(4) infinite;
+}
+
+@keyframes walkCycle {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-4px); }
+    75% { transform: translateY(1px); }
+}
+
+/* Trees */
+.map-tree {
+    position: absolute;
+    z-index: 3;
+    width: 28px;
+    height: 36px;
+    pointer-events: none;
+}
+
+.map-tree::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 12px;
+    background: #8B6914;
+    border: 1px solid var(--ink);
+}
+
+.map-tree::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: #38B366;
+    border: 2px solid var(--ink);
+    border-radius: 0;
+}
+
+/* Water feature */
+.map-water {
+    position: absolute;
+    z-index: 1;
+    background: linear-gradient(180deg, #36CFDD, #027AE9);
+    border: 2px solid #0E7490;
+    opacity: 0.6;
+    animation: waterShimmer 3s ease-in-out infinite;
+}
+
+@keyframes waterShimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.7; }
+}
+
+/* Treasure chest collectible */
+.map-chest {
+    position: absolute;
+    z-index: 8;
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s ease-out;
+    filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.3));
+}
+
+.map-chest:hover {
+    transform: scale(1.2) rotate(-5deg);
+}
+
+.map-chest.collected {
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+.map-chest.collected::after {
+    content: "✓";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    color: var(--c-green);
+    font-family: var(--font-pixel);
+}
+
+/* NPC on map */
+.map-npc {
+    position: absolute;
+    z-index: 15;
+    cursor: pointer;
+    animation: idleFloat 2s ease-in-out infinite;
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.2));
+}
+
+.map-npc:hover {
+    filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.2)) drop-shadow(0 0 8px rgba(255,213,26,0.4));
+}
+
+.map-npc .speech-bubble {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 3px solid var(--ink);
+    padding: 6px 10px;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--ink);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+    margin-bottom: 6px;
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.map-npc .speech-bubble::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--ink);
+}
+
+.map-npc:hover .speech-bubble {
+    opacity: 1;
+}
+
+/* Signpost */
+.map-signpost {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Star/coin collectibles */
+.map-star {
+    position: absolute;
+    z-index: 6;
+    width: 12px;
+    height: 12px;
+    background: var(--c-yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: starPulse 1s steps(3) infinite;
+    pointer-events: none;
+}
+
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+/* ==========================================================================
+   BOSS BATTLE (Contact Form)
+   ========================================================================== */
+
+.boss-arena {
+    position: relative;
+    background: linear-gradient(180deg, #101020 0%, #1a1a3a 100%);
+    border: 4px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    overflow: hidden;
+    min-height: 500px;
+}
+
+.boss-arena::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(255,255,255,0.02) 3px, rgba(255,255,255,0.02) 4px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.boss-arena .boss-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background:
+        radial-gradient(circle at 20% 80%, var(--c-red) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, var(--c-purple) 0%, transparent 40%);
+}
+
+.boss-hp-bar {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 300px;
+    max-width: 80%;
+}
+
+.boss-hp-label {
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    color: var(--c-yellow);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.boss-hp-track {
+    height: 14px;
+    background: var(--ink);
+    border: 2px solid var(--c-yellow);
+    position: relative;
+    overflow: hidden;
+}
+
+.boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(180deg, #38B366 0%, #2ea356 100%);
+    transition: width 0.3s ease-out;
+    position: relative;
+}
+
+.boss-hp-fill.warning {
+    background: linear-gradient(180deg, #FFD51A 0%, #F3A72F 100%);
+}
+
+.boss-hp-fill.danger {
+    background: linear-gradient(180deg, #F05A6E 0%, #dc2626 100%);
+}
+
+.boss-hp-segments {
+    position: absolute;
+    inset: 0;
+    display: flex;
+}
+
+.boss-hp-segment {
+    flex: 1;
+    border-right: 1px solid rgba(0,0,0,0.3);
+}
+
+.boss-sprite {
+    position: absolute;
+    bottom: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    font-size: 80px;
+    filter: drop-shadow(0 0 20px rgba(240,90,110,0.4));
+    animation: bossIdle 2s ease-in-out infinite;
+}
+
+@keyframes bossIdle {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+.boss-sprite.hit {
+    animation: bossHit 0.3s ease-out;
+}
+
+@keyframes bossHit {
+    0% { filter: brightness(1); }
+    30% { filter: brightness(2) saturate(2); transform: translateX(-50%) translateX(8px); }
+    60% { filter: brightness(0.5); transform: translateX(-50%) translateX(-8px); }
+    100% { filter: brightness(1); transform: translateX(-50%); }
+}
+
+/* Battle UI panels */
+.battle-panel {
+    background: rgba(16,16,32,0.95);
+    border: 3px solid var(--c-yellow);
+    box-shadow: 4px 4px 0 var(--ink);
+    z-index: 10;
+}
+
+.battle-menu-btn {
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    padding: 10px 16px;
+    background: transparent;
+    color: var(--white);
+    border: 2px solid var(--c-yellow);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    text-transform: uppercase;
+}
+
+.battle-menu-btn:hover {
+    background: var(--c-yellow);
+    color: var(--ink);
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--ink);
+}
+
+.battle-menu-btn.active {
+    background: var(--c-yellow);
+    color: var(--ink);
+}
+
+/* Damage number popup */
+.damage-popup {
+    position: absolute;
+    font-family: var(--font-pixel);
+    font-size: 16px;
+    color: var(--c-yellow);
+    text-shadow: 2px 2px 0 var(--ink), -1px -1px 0 var(--ink);
+    pointer-events: none;
+    z-index: 30;
+    animation: damageFloat 1s ease-out forwards;
+}
+
+@keyframes damageFloat {
+    0% { transform: translateY(0) scale(1.5); opacity: 1; }
+    80% { transform: translateY(-50px) scale(1); opacity: 0.8; }
+    100% { transform: translateY(-70px) scale(0.8); opacity: 0; }
+}
+
+/* Message dialog box */
+.battle-dialog {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    z-index: 15;
+}
+
+.battle-dialog-box {
+    background: rgba(16,16,32,0.97);
+    border: 3px solid var(--c-yellow);
+    padding: 14px 18px;
+    min-height: 70px;
+}
+
+.battle-dialog-text {
+    font-family: var(--font-retro);
+    font-size: 18px;
+    color: var(--white);
+    line-height: 1.5;
+}
+
+.battle-dialog-name {
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    color: var(--c-yellow);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.battle-dialog-continue {
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: var(--c-yellow);
+    animation: blink 1s steps(2) infinite;
+}
+
+/* ==========================================================================
+   FOOTER / MISC
+   ========================================================================== */
+
+@keyframes konamiPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ==========================================================================
+   SKILL TREE
+   ========================================================================== */
+
+.skill-tree {
+    position: relative;
+    min-height: 400px;
+}
+
+.skill-node {
+    position: absolute;
+    z-index: 5;
+}
+
+.skill-node-inner {
+    width: 56px;
+    height: 56px;
+    background: var(--ink);
+    border: 3px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.skill-node.unlocked .skill-node-inner {
+    border-color: var(--c-green);
+    background: rgba(56,179,102,0.2);
+}
+
+.skill-node:hover .skill-node-inner {
+    transform: scale(1.1);
+    border-color: var(--c-yellow);
+    box-shadow: 3px 3px 0 var(--c-yellow), 0 0 16px rgba(255,213,26,0.3);
+}
+
+.skill-connector {
+    position: absolute;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   WEATHER / AMBIENT SYSTEMS
+   ========================================================================== */
+
+/* Snow */
+.snowflake {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border: 1px solid rgba(255,255,255,0.5);
+    pointer-events: none;
+    z-index: 0;
+    animation: snowFall linear infinite;
+    opacity: 0.7;
+}
+
+@keyframes snowFall {
+    0% { transform: translateY(-10px) rotate(0deg); }
+    100% { transform: translateY(100vh) rotate(360deg); }
+}
+
+/* Floating fireflies */
+.firefly {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: var(--c-yellow);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    box-shadow: 0 0 6px var(--c-yellow);
+    animation: fireflyFloat 4s ease-in-out infinite;
+}
+
+@keyframes fireflyFloat {
+    0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+    25% { transform: translate(20px, -30px); opacity: 0.8; }
+    50% { transform: translate(-10px, -50px); opacity: 0.4; }
+    75% { transform: translate(30px, -20px); opacity: 0.9; }
+}
+
+/* ==========================================================================
+   MINI-GAME: Typing Challenge
+   ========================================================================== */
+
+.typing-game {
+    background: var(--ink);
+    border: 3px solid var(--c-green);
+    box-shadow: 4px 4px 0 var(--c-green);
+    padding: 16px;
+}
+
+.typing-target {
+    font-family: var(--font-retro);
+    font-size: 18px;
+    color: var(--white);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+}
+
+.typing-target .typed {
+    color: var(--c-green);
+}
+
+.typing-target .current {
+    background: var(--c-yellow);
+    color: var(--ink);
+    padding: 0 1px;
+}
+
+.typing-target .remaining {
+    color: rgba(255,255,255,0.4);
+}
+
+.typing-input {
+    width: 100%;
+    background: transparent;
+    border: 2px solid var(--c-green);
+    color: var(--c-green);
+    font-family: var(--font-retro);
+    font-size: 18px;
+    padding: 8px 12px;
+    outline: none;
+    caret-color: var(--c-yellow);
+}
+
+.typing-input:focus {
+    border-color: var(--c-yellow);
+}
+
+.typing-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    color: var(--c-yellow);
+    text-transform: uppercase;
+}
+
+/* ==========================================================================
+   FLAPPY BIRD MINI-GAME
+   ========================================================================== */
+
+/* ==========================================================================
+   TECH STACK MARQUEE — Scrolling rows with logos
+   ========================================================================== */
+
+.tech-marquee {
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    padding: 6px 0;
+}
+
+.tech-track {
+    display: inline-flex;
+    gap: 8px;
+    will-change: transform;
+}
+
+.tech-marquee-right .tech-track {
+    animation: marquee-right 30s linear infinite;
+}
+
+.tech-marquee-left .tech-track {
+    animation: marquee-left 30s linear infinite;
+}
+
+.tech-marquee:hover .tech-track {
+    animation-play-state: paused;
+}
+
+@keyframes marquee-right {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-left {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+}
+
+.tech-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 2px solid #101020;
+    padding: 5px 12px;
+    font-family: var(--font-pixel);
+    font-size: 8px;
+    color: #101020;
+    text-transform: uppercase;
+    box-shadow: 2px 2px 0 #101020;
+    flex-shrink: 0;
+}
+
+.tech-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   END OF FILE
+   ========================================================================== */

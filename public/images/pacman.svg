@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" shape-rendering="crispEdges">
+  <style>
+    /* Chomp animation - mouth opens and closes */
+    @keyframes chomp {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(45deg); }
+    }
+
+    /* Dot pulse */
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Dot disappear - when eaten */
+    @keyframes dot-eaten {
+      0% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0); }
+    }
+
+    .pac-mouth {
+      transform-origin: 100px 100px;
+      animation: chomp 0.4s steps(4) infinite;
+    }
+
+    .dot {
+      animation: dot-pulse 0.6s steps(2) infinite;
+    }
+
+    .dot-eaten {
+      animation: dot-eaten 0.2s steps(3) forwards;
+    }
+  </style>
+
+  <!-- Pac-Man body (yellow circle with mouth) -->
+  <g>
+    <!-- The "pie slice" cut out for the mouth - using path with even-odd fill rule -->
+    <path d="M 100 100
+             L 100 40
+             A 60 60 0 1 0 145 145
+             L 100 100 Z"
+          fill="#ffd60a"
+          stroke="#0f0f1e"
+          stroke-width="4"
+          stroke-linejoin="round"/>
+    <!-- Eye -->
+    <rect x="115" y="55" width="8" height="8" fill="#0f0f1e"/>
+    <rect x="117" y="57" width="3" height="3" fill="#fefefe"/>
+  </g>
+
+  <!-- Dots (trail) -->
+  <g class="dot" style="animation-delay: 0s">
+    <circle cx="20" cy="100" r="4" fill="#fefefe"/>
+  </g>
+  <g class="dot" style="animation-delay: 0.1s">
+    <circle cx="35" cy="100" r="4" fill="#fefefe"/>
+  </g>
+  <g class="dot" style="animation-delay: 0.2s">
+    <circle cx="50" cy="100" r="4" fill="#fefefe"/>
+  </g>
+  <g class="dot" style="animation-delay: 0.3s">
+    <circle cx="65" cy="100" r="4" fill="#fefefe"/>
+  </g>
+  <g class="dot" style="animation-delay: 0.4s">
+    <circle cx="80" cy="100" r="4" fill="#fefefe"/>
+  </g>
+</svg>

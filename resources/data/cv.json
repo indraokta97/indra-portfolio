@@ -1,0 +1,65 @@
+{
+  "name": "Indra Oktafian Hidayat",
+  "headline": "Project Management & Event Operations · Laravel Web Developer",
+  "email": "indraoktafian97@gmail.com",
+  "phone": "+62 877-3008-4192",
+  "location": "Yogyakarta, Indonesia",
+  "profile": "Event operations lead with a nuclear engineering degree who now ships web applications. Ran national-scale programs for 500+ participants and directed 200+ member teams; today builds custom websites and systems on Laravel for freelance clients.",
+  "competencies": [
+    "Project Management", "Event Planning & Execution", "Timeline Development",
+    "Budget Planning (RAB)", "Stakeholder & Vendor Coordination", "Team Leadership",
+    "Cross-functional Collaboration", "Client Communication", "Risk Management",
+    "Problem Solving", "Event Operations", "Performance Evaluation"
+  ],
+  "tools": [
+    "Google Workspace", "Notion / Trello", "Data Analysis & Reporting",
+    "Canva · Figma · CorelDraw", "CapCut"
+  ],
+  "web": [
+    "PHP · Laravel", "MySQL · SQLite", "HTML · CSS · JavaScript",
+    "Tailwind CSS", "Git & Deployment", "API Integration"
+  ],
+  "leadership": [
+    {
+      "role": "Coordinator",
+      "org": "Masjid Kampus UGM",
+      "period": "Jul 2025 – Jul 2026",
+      "points": [
+        "Led the team to Overall Champion (Juara Umum) at the 2025 national campus-mosque jamboree by matching each competition to the division best positioned to win it.",
+        "Built a weekly content calendar that lifted social media output 90%.",
+        "Co-founded Rumah Qur'an: wrote the first curriculum and put a management team behind it."
+      ]
+    },
+    {
+      "role": "Chairperson",
+      "org": "UKM Jama'ah Shalahuddin UGM",
+      "period": "Dec 2022 – Dec 2023",
+      "points": [
+        "Ran strategy and operations for a 200+ member organization working across eight departments.",
+        "Raised routine-program participation 40% by redesigning engagement around what members actually wanted.",
+        "Remapped handoffs across eight departments; the year-end accountability report passed with zero member objections."
+      ]
+    }
+  ],
+  "programs": [
+    {"role": "Quality Assurance Coordinator", "org": "Ramadhan Di Kampus UGM", "period": "Sep 2025 – Mar 2026", "points": ["Standardized evaluation docs and a feedback loop across 10+ activities, feeding 5+ strategic fixes to a program serving 500+ people."]},
+    {"role": "Parallel Sessions Coordinator", "org": "ASTECHNOVA — International Energy Conference 2025, UGM", "period": "Sep – Oct 2025", "points": ["Ran presenter schedules, room readiness, and session flow for international parallel tracks, keeping moderators and speakers in sync across concurrent rooms."]},
+    {"role": "Steering Committee Coordinator", "org": "Ramadhan Di Kampus UGM", "period": "Aug 2022 – Feb 2023", "points": ["Set direction for a 500+ participant program and kept 10+ external partners, including government bodies, on board through written agreements."]},
+    {"role": "Event Director", "org": "Ramadhan Di Kampus UGM", "period": "Dec 2021 – Apr 2022", "points": ["Owned the full lifecycle of daily and weekly programming for 500+ people under strict budget controls.", "Split work cleanly across creative, operations, and PR, leading a 200+ member team under tight deadlines."]},
+    {"role": "Project Manager — New Student Admission", "org": "KMT FT UGM", "period": "Sep – Dec 2021", "points": ["Planned and delivered the faculty orientation end-to-end: schedule, committee, participants, and event operations. Onboarded 80 new students."]}
+  ],
+  "education": {
+    "degree": "B.Eng. Nuclear Engineering (S.T.)",
+    "school": "Universitas Gadjah Mada",
+    "period": "2020 – 2026",
+    "note": "GPA 3.10"
+  },
+  "certifications": [
+    {"name": "The Engineering Leadership Workshop XIV", "org": "BEM KMFT UGM", "period": "Jul 2021", "note": "Score 881/900, Grade A"},
+    {"name": "Salman Spiritual Class (SSC) 31", "org": "Yayasan Pembina Masjid Salman ITB", "period": "Aug 2021", "note": ""}
+  ],
+  "awards": [
+    "Overall Champion (Juara Umum), National Jamboree of the Indonesian Campus Mosque Association — 2025",
+    "2nd Place, Mosque Program Innovation Competition, National Jamboree of the Indonesian Campus Mosque Association — 2023"
+  ]
+}
