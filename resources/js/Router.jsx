@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Route } from 'wouter';
+import { Route, Switch } from 'wouter';
 import Welcome from './Pages/Welcome';
 import Stage from './Pages/Stage';
 import Project from './Pages/Project';
 import Event from './Pages/Event';
 import Writing from './Pages/Writing';
 import CV from './Pages/CV';
+import NotFound from './Pages/NotFound';
 
 export default function Router() {
     const [ready, setReady] = useState(false);
@@ -18,6 +19,8 @@ export default function Router() {
         const path = window.location.pathname;
         const isRoot = path === '/';
         const isStage = /^\/stage\/\d+\/?$/.test(path);
+        const isDetail = /^\/(work|programs|writing)\/.+/.test(path);
+        const fromDetail = /\/(work|programs|writing)\//.test(document.referrer);
 
         const killBoot = (fast) => {
             if (boot.dataset.bootDone) return;
@@ -47,7 +50,7 @@ export default function Router() {
             return () => clearTimeout(timer);
         }
 
-        if (isStage) {
+        if (isStage && !fromDetail) {
             requestAnimationFrame(() => {
                 setTimeout(() => { if (fill) fill.style.width = '100%'; }, 150);
             });
@@ -66,7 +69,7 @@ export default function Router() {
     if (!ready) return null;
 
     return (
-        <>
+        <Switch>
             <Route path="/">
                 <Welcome />
             </Route>
@@ -85,6 +88,9 @@ export default function Router() {
             <Route path="/cv">
                 <CV />
             </Route>
-        </>
+            <Route>
+                <NotFound />
+            </Route>
+        </Switch>
     );
 }

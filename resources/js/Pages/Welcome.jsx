@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'wouter';
 import AppLayout from '../Layouts/AppLayout';
+import VisitorCounter from '../Components/VisitorCounter';
 import { site } from '../data/site';
 
 export default function Welcome() {
@@ -23,13 +24,18 @@ export default function Welcome() {
         { src: '/images/hobbies/bigwin2.webp', label: 'PES — Big Win' },
     ];
     const [hobbyIndex, setHobbyIndex] = useState(0);
+    const [viewIndex, setViewIndex] = useState(null);
     const [dragging, setDragging] = useState(false);
     const [dragOffset, setDragOffset] = useState(0);
     const dragRef = useRef(null);
+    const movedRef = useRef(false);
+    const hobbyClicksRef = useRef(new Map());
+    const lastHobbyClickRef = useRef(0);
     const HobbyDragThreshold = 60;
     const onHobbyStart = (e) => {
         const x = e.touches ? e.touches[0].clientX : e.clientX;
         dragRef.current = { startX: x, offset: 0 };
+        movedRef.current = false;
         setDragging(true);
     };
     const onHobbyMove = (e) => {
@@ -37,6 +43,7 @@ export default function Welcome() {
         const x = e.touches ? e.touches[0].clientX : e.clientX;
         const off = x - dragRef.current.startX;
         dragRef.current.offset = off;
+        if (Math.abs(off) > 5) movedRef.current = true;
         setDragOffset(off);
     };
     const onHobbyEnd = () => {
@@ -52,6 +59,95 @@ export default function Welcome() {
         setDragOffset(0);
         setDragging(false);
     };
+    const onHobbyPhotoClick = () => {
+        if (movedRef.current) return;
+        const now = Date.now();
+        const rapid = now - lastHobbyClickRef.current < 600;
+        lastHobbyClickRef.current = now;
+        const src = hobbyPhotos[hobbyIndex].src;
+        if (rapid) {
+            const n = (hobbyClicksRef.current.get(src) || 0) + 1;
+            if (n >= 5) {
+                hobbyClicksRef.current.set(src, 0);
+                explodeHobbyPhoto('hobby-frame');
+                return;
+            }
+            hobbyClicksRef.current.set(src, n);
+            return;
+        }
+        hobbyClicksRef.current.set(src, 0);
+        setViewIndex(hobbyIndex);
+    };
+
+    const onViewPhotoClick = () => {
+        const src = hobbyPhotos[viewIndex].src;
+        const n = (hobbyClicksRef.current.get(src) || 0) + 1;
+        if (n >= 5) {
+            hobbyClicksRef.current.set(src, 0);
+            explodeHobbyPhoto('hobby-frame-view');
+            return;
+        }
+        hobbyClicksRef.current.set(src, n);
+    };
+
+    const explodeHobbyPhoto = (frameId) => {
+        if (window.SFX) {
+            if (window.SFX.hit) window.SFX.hit();
+            if (window.SFX.boxBreak) window.SFX.boxBreak();
+        }
+        if (window.rumble) window.rumble(70);
+        ['portfolio-content', 'hobby-lightbox'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el && !el.classList.contains('screen-shake')) {
+                el.classList.add('screen-shake');
+                setTimeout(() => el.classList.remove('screen-shake'), 600);
+            }
+        });
+        const frame = document.getElementById(frameId);
+        if (!frame) return;
+        const rect = frame.getBoundingClientRect();
+        const cx = rect.width / 2;
+        const cy = rect.height / 2;
+        const colors = ['#FFD51A', '#F05A6E', '#36CFDD', '#FFFFFF', '#73DC57'];
+        for (let i = 0; i < 15; i++) {
+            const pt = document.createElement('div');
+            pt.className = 'hobby-burst';
+            pt.style.left = cx + 'px';
+            pt.style.top = cy + 'px';
+            pt.style.background = colors[i % colors.length];
+            pt.style.setProperty('--tx', (Math.random() * 170 - 85) + 'px');
+            pt.style.setProperty('--ty', (Math.random() * 170 - 85) + 'px');
+            pt.style.setProperty('--tr', (Math.random() * 540 - 270) + 'deg');
+            frame.appendChild(pt);
+        }
+        const boom = document.createElement('div');
+        boom.className = 'hobby-boom-label';
+        boom.textContent = 'BOOM!';
+        boom.style.setProperty('--bx', (Math.random() * 20 - 10) + 'px');
+        frame.appendChild(boom);
+        const photo = frame.querySelector('[data-hobby-photo]');
+        if (photo) photo.classList.add('hobby-explode');
+        setTimeout(() => {
+            frame.querySelectorAll('.hobby-burst, .hobby-boom-label').forEach((n) => n.remove());
+            if (photo) photo.classList.remove('hobby-explode');
+        }, 1000);
+    };
+
+    useEffect(() => {
+        if (viewIndex === null) return;
+        const onKey = (e) => {
+            if (e.key === 'Escape') {
+                setViewIndex(null);
+            } else if (e.key === 'ArrowRight') {
+                setViewIndex((i) => (i + 1) % hobbyPhotos.length);
+            } else if (e.key === 'ArrowLeft') {
+                setViewIndex((i) => (i - 1 + hobbyPhotos.length) % hobbyPhotos.length);
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewIndex === null]);
 
     useEffect(() => {
         const showLoadingScreen = (duration = 1400) => {
@@ -286,7 +382,13 @@ export default function Welcome() {
 
                         setTimeout(() => {
                             if (window.SFX && window.SFX.boxBreak) window.SFX.boxBreak();
+                            if (window.rumble) window.rumble(60);
                             box.classList.add('box-broken');
+                            const stageSec = document.getElementById('stage-select');
+                            if (stageSec && !stageSec.classList.contains('screen-shake')) {
+                                stageSec.classList.add('screen-shake');
+                                setTimeout(() => stageSec.classList.remove('screen-shake'), 600);
+                            }
                             character.style.transition = 'bottom 0.15s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
                             character.style.bottom = '0px';
 
@@ -406,7 +508,7 @@ export default function Welcome() {
             let roleInterval;
             let roleTimeout;
             if (el) {
-                const roleList = p.roles || ['Web Developer', 'Event Specialist', 'Copywriter'];
+                const roleList = p.roles || ['Web Developer', 'Event Enthusiast', 'Copywriter', 'Nuclear Engineer'];
                 let idx = 0;
 
                 const typeRole = (text, callback) => {
@@ -467,7 +569,7 @@ export default function Welcome() {
     const writingsCount = writings.length;
 
     return (
-        <AppLayout title="Indra Okta's Portfolio — Indie Dev" profile={p}>
+        <AppLayout title="Indra Okta" profile={p}>
             <section
                 id="welcome"
                 className="welcome-screen min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -516,7 +618,7 @@ export default function Welcome() {
                         style={{ animationDelay: '0.3s' }}
                     >
                         I Build Things.
-                        <br className="hidden sm:inline" />
+                        <br className="hidden sm:inline" />{' '}
                         Sometimes They Work.
                     </p>
 
@@ -576,12 +678,12 @@ export default function Welcome() {
                                     </div>
 
                                     <div className="flex items-center justify-center gap-3 mt-3">
-                                        <a href={p.github || '#'} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center bg-[#101020] border-2 border-[#101020] hover:bg-[#B45309] hover:border-[#B45309] transition-colors" title="GitHub">
+                                        <div className="w-8 h-8 flex items-center justify-center bg-[#101020] border-2 border-[#101020] opacity-50 cursor-not-allowed" title="GitHub">
                                             <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
-                                        </a>
-                                        <a href={p.linkedin || '#'} target="_blank" rel="noopener noreferrer" className="w-8 h-8 flex items-center justify-center bg-[#101020] border-2 border-[#101020] hover:bg-[#0A66C2] hover:border-[#0A66C2] transition-colors" title="LinkedIn">
+                                        </div>
+                                        <div className="w-8 h-8 flex items-center justify-center bg-[#101020] border-2 border-[#101020] opacity-50 cursor-not-allowed" title="LinkedIn">
                                             <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
-                                        </a>
+                                        </div>
                                         <a href={`mailto:${p.email || ''}`} className="w-8 h-8 flex items-center justify-center bg-[#101020] border-2 border-[#101020] hover:bg-[#EA4335] hover:border-[#EA4335] transition-colors" title="Email">
                                             <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z" /></svg>
                                         </a>
@@ -632,12 +734,11 @@ export default function Welcome() {
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg', 'HTML'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg', 'CSS'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg', 'JavaScript'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', 'TypeScript'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', 'React'],
                                                     ['/images/inertia-logo.svg', 'Inertia'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', 'Tailwind CSS'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg', 'Vite'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg', 'Canva'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg', 'Figma'],
                                                 ],
                                             },
                                             {
@@ -646,11 +747,12 @@ export default function Welcome() {
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg', 'PHP'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg', 'Laravel'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg', 'MySQL'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg', 'PostgreSQL'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg', 'SQLite'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/wordpress/wordpress-plain.svg', 'WordPress'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg', 'C++'],
-                                                    [null, 'TOPAS Monte Carlo', '☢'],
-                                                    [null, 'Geant4', '◈'],
+                                                    ['/images/projects/topas-ion.jpg', 'TOPAS'],
+                                                    ['/images/projects/geant4-technologie.jpg', 'Geant4'],
                                                 ],
                                             },
                                             {
@@ -658,12 +760,9 @@ export default function Welcome() {
                                                 items: [
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg', 'Git'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg', 'GitHub'],
+                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg', 'Docker'],
                                                     ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg', 'Vercel'],
                                                     ['https://railway.com/brand/logo-dark.png', 'Railway'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg', 'VS Code'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg', 'npm'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/composer/composer-original.svg', 'Composer'],
-                                                    ['https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg', 'Gemini AI'],
                                                 ],
                                             },
                                         ].map((row, i) => {
@@ -794,9 +893,9 @@ export default function Welcome() {
                                             }}
                                         >
                                             {hobbyPhotos.map((hp) => (
-                                                <div key={hp.src} className="relative w-full h-full shrink-0 flex items-center justify-center">
+                                                <div key={hp.src} id="hobby-frame" className="relative w-full h-full shrink-0 flex items-center justify-center" onClick={onHobbyPhotoClick} style={{ cursor: 'pointer' }}>
                                                     <img src={hp.src} alt="" aria-hidden="true" draggable="false" className="absolute inset-0 w-full h-full object-cover scale-110 blur-lg brightness-75" />
-                                                    <img src={hp.src} alt={hp.label} draggable="false" className="relative max-w-full max-h-full object-contain" style={{ imageRendering: 'auto' }} />
+                                                    <img src={hp.src} alt={hp.label} data-hobby-photo draggable="false" className="relative max-w-full max-h-full object-contain" style={{ imageRendering: 'auto' }} />
                                                 </div>
                                             ))}
                                         </div>
@@ -816,11 +915,73 @@ export default function Welcome() {
                                         ))}
                                     </div>
                                 </div>
-                                <p className="font-pixel text-[6px] text-[#55607A] uppercase mt-1.5 text-center">{hobbyPhotos[hobbyIndex].label}</p>
+                                <p className="font-pixel text-[6px] text-[#55607A] uppercase mt-1.5 text-center">
+                                        {hobbyPhotos[hobbyIndex].label} · click to enlarge
+                                    </p>
                             </div>
                         </div>
                     </div>
                 </section>
+
+                {viewIndex !== null && (
+                    <div
+                        id="hobby-lightbox"
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#101020]/90 p-4 sm:p-8"
+                        onClick={() => setViewIndex(null)}
+                    >
+                        <div
+                            className="relative max-w-3xl w-full"
+                            onClick={(e) => e.stopPropagation()}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-label={hobbyPhotos[viewIndex].label}
+                        >
+                            <div className="pixel-card overflow-hidden">
+                                <div id="hobby-frame-view" className="relative w-full h-[55vh] sm:h-[70vh] flex items-center justify-center bg-[#0A0A20]">
+                                    <img
+                                        src={hobbyPhotos[viewIndex].src}
+                                        alt={hobbyPhotos[viewIndex].label}
+                                        data-hobby-photo
+                                        draggable="false"
+                                        onClick={onViewPhotoClick}
+                                        className="max-w-full max-h-full object-contain"
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setViewIndex(null)}
+                                aria-label="Tutup"
+                                className="absolute -top-3 -right-3 w-9 h-9 bg-[#F05A6E] text-[#FFFFFF] border-[3px] border-[#101020] shadow-[2px_2px_0_#101020] font-pixel text-sm flex items-center justify-center hover:bg-[#FFD51A] hover:text-[#101020]"
+                            >✕</button>
+                            <button
+                                type="button"
+                                onClick={() => setViewIndex((i) => (i - 1 + hobbyPhotos.length) % hobbyPhotos.length)}
+                                aria-label="Sebelumnya"
+                                className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#FFFFFF] text-[#101020] border-[3px] border-[#101020] shadow-[2px_2px_0_#101020] font-pixel text-sm flex items-center justify-center hover:bg-[#FFD51A]"
+                            >◀</button>
+                            <button
+                                type="button"
+                                onClick={() => setViewIndex((i) => (i + 1) % hobbyPhotos.length)}
+                                aria-label="Berikutnya"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-[#FFFFFF] text-[#101020] border-[3px] border-[#101020] shadow-[2px_2px_0_#101020] font-pixel text-sm flex items-center justify-center hover:bg-[#FFD51A]"
+                            >▶</button>
+                            <div className="flex justify-center gap-0.5 mt-3">
+                                {hobbyPhotos.map((hp, i) => (
+                                    <button
+                                        key={hp.src}
+                                        type="button"
+                                        onClick={() => setViewIndex(i)}
+                                        aria-label={hp.label}
+                                        className={`w-1.5 h-1.5 border-2 border-[#FFFFFF] ${i === viewIndex ? 'bg-[#F05A6E]' : 'bg-[#FFFFFF]/40 hover:bg-[#FFD51A]'}`}
+                                    ></button>
+                                ))}
+                            </div>
+                            <p className="font-pixel text-[7px] text-[#FFFFFF] uppercase mt-1.5 text-center">{hobbyPhotos[viewIndex].label}</p>
+                        </div>
+                    </div>
+                )}
 
                 <section className="bg-sky-texture py-8 sm:py-10" id="contact">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -865,10 +1026,11 @@ export default function Welcome() {
                 </section>
 
                 <footer className="bg-[#BFE0FF] border-t-[3px] border-[#105E3D] py-8">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
                         <div className="font-pixel text-[10px] text-[#105E3D] uppercase cursor-blink">
                             ▶ THANKS FOR BEING HERE! ▶
                         </div>
+                        <VisitorCounter />
                     </div>
                 </footer>
             </div>

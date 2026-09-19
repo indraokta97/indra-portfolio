@@ -119,6 +119,12 @@ window.updateSoundButton = updateSoundButton;
 window.initSoundSystem = initSoundSystem;
 window.REDUCED = REDUCED;
 
+window.rumble = function (pattern) {
+    try {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(pattern);
+    } catch (e) {}
+};
+
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSoundSystem);
 } else {

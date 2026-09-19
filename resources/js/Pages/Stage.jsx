@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppLayout from '../Layouts/AppLayout';
 import { site } from '../data/site';
 import { getTagLogo } from '../data/logos';
@@ -80,6 +80,13 @@ export default function Stage({ stageNumber }) {
     const [page, setPage] = useState(0);
     const pageItems = stageNumber === 1 ? itemsToShow.slice(page * PROJECTS_PER_PAGE, page * PROJECTS_PER_PAGE + PROJECTS_PER_PAGE) : itemsToShow;
 
+    useEffect(() => {
+        const t = setTimeout(() => {
+            if (window.unlockAchievement) window.unlockAchievement('stage-' + stageNumber);
+        }, 2600);
+        return () => clearTimeout(t);
+    }, [stageNumber]);
+
     const renderCard = (item) => {
         const inner = (
             <>
@@ -92,6 +99,9 @@ export default function Stage({ stageNumber }) {
                         )}
                         {item.on_going && (
                             <div className="absolute top-2 right-2 font-pixel text-[8px] px-2 py-1 bg-[#F05A6E] text-white border-2 border-[#101020] uppercase">● On Going</div>
+                        )}
+                        {item.badge && (
+                            <div className="absolute top-2 right-2 font-pixel text-[8px] px-2 py-1 bg-[#F05A6E] text-white border-2 border-[#101020] uppercase">{item.badge}</div>
                         )}
                     </div>
                 )}
@@ -108,8 +118,11 @@ export default function Stage({ stageNumber }) {
                             })}
                         </div>
                     )}
-                    {stageNumber === 2 && item.role && (
-                        <div className="font-pixel text-[8px] text-[#BE123C] uppercase mb-1.5">▶ {item.role}</div>
+                    {stageNumber === 2 && item.scale && (
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                            <span className="font-pixel text-[7px] px-1.5 py-0.5 bg-[#101020] text-white border border-[#101020] uppercase">{item.scale}</span>
+                            {item.role && <span className="font-pixel text-[8px] text-[#BE123C] uppercase">▶ {item.role}</span>}
+                        </div>
                     )}
                     {stageNumber === 3 && item.outlet && (
                         <div className="font-pixel text-[8px] text-[#0E7490] uppercase mb-1.5">▶ {item.outlet}</div>
@@ -222,7 +235,7 @@ export default function Stage({ stageNumber }) {
                             <div className="flex items-center justify-center gap-4 mt-10 font-pixel text-[10px] uppercase">
                                 <button
                                     type="button"
-                                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                                    onClick={() => { setPage((p) => Math.max(0, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                                     disabled={page === 0}
                                     className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[#101020] bg-[#FFFFFF] text-[#101020] hover:bg-[#FFD51A] transition-colors disabled:opacity-40 disabled:hover:bg-[#FFFFFF] disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                                 >
@@ -233,7 +246,7 @@ export default function Stage({ stageNumber }) {
                                 </span>
                                 <button
                                     type="button"
-                                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                                    onClick={() => { setPage((p) => Math.min(totalPages - 1, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                                     disabled={page === totalPages - 1}
                                     className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[#101020] bg-[#FFFFFF] text-[#101020] hover:bg-[#FFD51A] transition-colors disabled:opacity-40 disabled:hover:bg-[#FFFFFF] disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#B45309]"
                                 >

@@ -1,6 +1,19 @@
 const ALLOWED = new Set(['masjidkampus.ugm.ac.id', 'js.ugm.ac.id']);
 const MAX_REDIRECTS = 4;
 
+const PROXY_CSP =
+    "default-src 'self' https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://ajax.googleapis.com https://masjidkampus.ugm.ac.id https://js.ugm.ac.id https://www.googletagmanager.com https://www.google-analytics.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "font-src 'self' data: https://fonts.gstatic.com https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "img-src 'self' data: https://secure.gravatar.com https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "media-src 'self' blob: https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "connect-src 'self' https://masjidkampus.ugm.ac.id https://js.ugm.ac.id https://www.google-analytics.com https://www.googletagmanager.com; " +
+    "object-src 'none'; " +
+    "base-uri 'self' https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "form-action 'self' https://masjidkampus.ugm.ac.id https://js.ugm.ac.id; " +
+    "frame-ancestors 'self'";
+
 function isAllowed(raw) {
     let p;
     try {
@@ -71,6 +84,10 @@ export default async function handler(req, res) {
         res.setHeader('Content-Type', isHtml ? 'text/html; charset=utf-8' : (r.headers.get('content-type') || 'text/html; charset=utf-8'));
         res.setHeader('Cache-Control', 'no-store');
         res.setHeader('X-Robots-Tag', 'noindex');
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+        if (isHtml) {
+            res.setHeader('Content-Security-Policy', PROXY_CSP);
+        }
         res.send(isHtml ? body : JSON.stringify({ ok: true }));
         return;
     }

@@ -21,7 +21,9 @@ function renderRich(text) {
 
 export default function Event({ slug }) {
     const event = site.events.find(e => e.slug === slug) || site.events[0];
-    const next = site.events.find(e => e.slug !== event.slug);
+    const idx = site.events.findIndex(e => e.slug === event.slug);
+    const prev = idx > 0 ? site.events[idx - 1] : null;
+    const next = idx < site.events.length - 1 ? site.events[idx + 1] : null;
 
     const gallery = event.gallery || [];
     const captions = event.gallery_captions || [];
@@ -29,12 +31,8 @@ export default function Event({ slug }) {
     return (
         <AppLayout title={event.event}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
-                <nav className="flex items-center gap-2 font-pixel text-[8px] text-[#3A4657] mb-8 uppercase">
-                    <a href="/" className="hover:text-[#B45309]">▶ HOME</a>
-                    <span>▶</span>
-                    <a href="/stage/2" className="hover:text-[#B45309]">▶ STAGE 2</a>
-                    <span>▶</span>
-                    <span className="text-[#BE123C]">{event.event.toUpperCase()}</span>
+                <nav className="mb-8">
+                    <a href="/stage/2" className="font-pixel text-[9px] text-[#3A4657] hover:text-[#B45309] uppercase">◀ BACK</a>
                 </nav>
 
                 <h1 className="font-pixel text-2xl sm:text-3xl lg:text-4xl text-[#101020] uppercase leading-snug mb-4">{event.event}</h1>
@@ -112,17 +110,28 @@ export default function Event({ slug }) {
                     </div>
                 )}
 
-                {next && (
-                    <a href={'/programs/' + next.slug} className="pixel-card group block mt-8">
-                        <div className="p-4 flex items-center justify-between">
-                            <div>
-                                <div className="font-pixel text-[8px] text-[#BE123C] uppercase">▶ NEXT QUEST</div>
-                                <div className="font-pixel text-sm text-[#101020] group-hover:text-[#B45309] mt-1 uppercase">{next.event}</div>
+                <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                    {prev && (
+                        <a href={'/programs/' + prev.slug} className="pixel-card group flex-1 block">
+                            <div className="p-4 flex items-center justify-between">
+                                <div>
+                                    <div className="font-pixel text-[8px] text-[#3A4657] uppercase">◀ PREV</div>
+                                    <div className="font-pixel text-sm text-[#101020] group-hover:text-[#B45309] mt-1 uppercase">{prev.event}</div>
+                                </div>
                             </div>
-                            <div className="font-pixel text-[10px] text-[#B45309]">▶▶</div>
-                        </div>
-                    </a>
-                )}
+                        </a>
+                    )}
+                    {next && (
+                        <a href={'/programs/' + next.slug} className="pixel-card group flex-1 block">
+                            <div className="p-4 flex items-center justify-between">
+                                <div className="text-right ml-auto">
+                                    <div className="font-pixel text-[8px] text-[#3A4657] uppercase">NEXT ▶</div>
+                                    <div className="font-pixel text-sm text-[#101020] group-hover:text-[#B45309] mt-1 uppercase">{next.event}</div>
+                                </div>
+                            </div>
+                        </a>
+                    )}
+                </div>
 
                 <aside className="hidden lg:block fixed right-4 top-1/2 -translate-y-1/2 z-30">
                     <div className="pixel-border bg-sky-texture p-2 flex flex-col gap-2">

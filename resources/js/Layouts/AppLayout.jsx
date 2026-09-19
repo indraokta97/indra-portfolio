@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CommandPalette from '../Components/CommandPalette';
 
 export default function AppLayout({ children, title, profile }) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -23,6 +24,14 @@ export default function AppLayout({ children, title, profile }) {
             const scrollHeight = document.documentElement.scrollHeight;
             const clientHeight = document.documentElement.clientHeight;
             setAtBottom(scrollTop + clientHeight >= scrollHeight - 80);
+
+            const range = scrollHeight - clientHeight;
+            const pct = range > 0 ? Math.min(100, Math.max(0, (scrollTop / range) * 100)) : 100;
+            const fill = document.getElementById('xp-fill');
+            const tag = document.getElementById('xp-tag');
+            const label = 'LEVEL XP ' + Math.round(pct) + '%';
+            if (fill) fill.style.width = pct + '%';
+            if (tag) { tag.style.left = pct + '%'; tag.textContent = label; }
         };
         onScroll();
         window.addEventListener('scroll', onScroll);
@@ -35,7 +44,10 @@ export default function AppLayout({ children, title, profile }) {
 
     return (
         <div className="min-h-screen flex flex-col pixel-body">
-            <div id="scroll-progress" aria-hidden="true"></div>
+            <div id="xp-bar" aria-hidden="true">
+                <div id="xp-fill"></div>
+                <div id="xp-tag">LEVEL XP 0%</div>
+            </div>
 
             <a className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-[#A9D4F5] text-[#101020] px-4 py-2 font-pixel text-xs uppercase" href="#main">
                 Skip to main content
@@ -55,6 +67,10 @@ export default function AppLayout({ children, title, profile }) {
                     </nav>
 
                     <div className="flex items-center gap-2">
+                        <button type="button" id="cmd-k-toggle" onClick={() => window.openCommandPalette && window.openCommandPalette()} className="font-pixel text-[8px] text-[#101020] hover:text-[#B45309] transition-colors cursor-pointer uppercase hidden sm:inline-block" aria-label="Search (Ctrl+K)">
+                            Search
+                        </button>
+
                         <button type="button" id="sound-toggle" onClick={() => window.toggleSound && window.toggleSound()} className="font-pixel text-[8px] text-[#105E3D] hover:text-[#B45309] transition-colors cursor-pointer uppercase hidden sm:inline-block" aria-label="Toggle sound">
                             🔊 SOUND
                         </button>
@@ -74,6 +90,7 @@ export default function AppLayout({ children, title, profile }) {
                         <a className="nav-link menu-hover px-3 py-2 text-[#101020] hover:text-[#B45309] hover:bg-[#FFD51A]/30 transition-colors uppercase" data-nav="stage-select" href="/#stage-select" onClick={() => setMenuOpen(false)}>PROJECT</a>
                         <a className="nav-link menu-hover px-3 py-2 text-[#101020] hover:text-[#B45309] hover:bg-[#FFD51A]/30 transition-colors uppercase" data-nav="contact" href="/#contact" onClick={() => setMenuOpen(false)}>CONTACT</a>
                         <button type="button" onClick={() => { window.toggleSound && window.toggleSound(); setMenuOpen(false); }} className="text-left px-3 py-2 text-[#105E3D] hover:text-[#B45309] transition-colors uppercase">🔊 SOUND</button>
+                        <button type="button" onClick={() => { window.openCommandPalette && window.openCommandPalette(); setMenuOpen(false); }} className="text-left px-3 py-2 text-[#101020] hover:text-[#B45309] hover:bg-[#FFD51A]/30 transition-colors uppercase">SEARCH (CTRL+K)</button>
                     </nav>
                 </div>
             </header>
@@ -81,6 +98,8 @@ export default function AppLayout({ children, title, profile }) {
             <main id="main" className="flex-1">
                 {children}
             </main>
+
+            <CommandPalette />
 
             {/* Floating contact character */}
             <a href="/#contact" id="contact-character" className={`fixed bottom-4 right-4 z-30 group block focus:outline-none focus:ring-2 focus:ring-[#B45309] focus:ring-offset-2 focus:ring-offset-[#101020] transition-all duration-300 ${atBottom ? 'opacity-0 translate-y-6 pointer-events-none' : 'opacity-100 translate-y-0'}`}>

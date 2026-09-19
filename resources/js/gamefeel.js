@@ -36,6 +36,7 @@
         if (stageBox) {
             s.stageSelect();
             spawnXP(stageBox);
+            if (window.rumble) window.rumble(25);
             return;
         }
 
@@ -82,4 +83,151 @@
         const box = e.target.closest('.stage-box');
         if (box) spawnXP(box);
     });
+
+    /* --- 4. PIXEL CURSOR TRAIL --- */
+    (function initCursorTrail() {
+        const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (REDUCED) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'cursor-trail';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const COLORS = ['#FFD51A', '#F05A6E', '#36CFDD', '#FFFFFF'];
+        let parts = [];
+        let rafId = null;
+        let running = false;
+        let lastX = null;
+        let lastY = null;
+        const MAX = 140;
+
+        function resize() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.floor(window.innerWidth * dpr);
+            canvas.height = Math.floor(window.innerHeight * dpr);
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function spawn(x, y) {
+            const life = 26 + Math.random() * 24;
+            const size = 2 + Math.random() * 3;
+            parts.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 1.7,
+                vy: -0.5 - Math.random() * 1.3,
+                size,
+                life,
+                maxLife: life,
+                color: COLORS[(Math.random() * COLORS.length) | 0],
+            });
+            if (parts.length > MAX) parts.splice(0, parts.length - MAX);
+        }
+
+        function tick() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = parts.length - 1; i >= 0; i--) {
+                const p = parts[i];
+                p.life -= 1;
+                if (p.life <= 0) { parts.splice(i, 1); continue; }
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.06;
+                const a = Math.max(0, p.life / p.maxLife);
+                const s = p.size * a + 1;
+                ctx.globalAlpha = a;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(Math.round(p.x - s / 2), Math.round(p.y - s / 2), Math.round(s), Math.round(s));
+            }
+            ctx.globalAlpha = 1;
+            if (parts.length) {
+                rafId = requestAnimationFrame(tick);
+            } else {
+                running = false;
+                rafId = null;
+            }
+        }
+
+        function onPointerMove(e) {
+            if (e.pointerType === 'touch') return;
+            const x = e.clientX;
+            const y = e.clientY;
+            const moved = lastX === null || Math.hypot(x - lastX, y - lastY) > 8;
+            if (!moved) return;
+            lastX = x;
+            lastY = y;
+            spawn(x, y + 5);
+            spawn(x + 2, y + 6);
+            if (!running) {
+                running = true;
+                rafId = requestAnimationFrame(tick);
+            }
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+        window.addEventListener('pointermove', onPointerMove, { passive: true });
+        document.addEventListener('mouseleave', () => { lastX = null; lastY = null; });
+    })();
+
+    /* --- 5. RETRO PIXEL CURSOR --- */
+    (function initPixelCursor() {
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        const HOT = 'a, button, .stage-box, [role="button"], input, select, textarea, label, summary, [data-copy], .nav-link, .tech-item';
+        const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const el = document.createElement('div');
+        el.id = 'pixel-cursor';
+        el.innerHTML = '<div id="pixel-cursor-sprite"></div>';
+        el.classList.add('hide');
+        document.body.appendChild(el);
+
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2;
+        let tx = x;
+        let ty = y;
+        let raf = null;
+
+        function place() {
+            el.style.transform = 'translate3d(' + Math.round(x) + 'px,' + Math.round(y) + 'px,0)';
+        }
+
+        function loop() {
+            x += (tx - x) * 0.4;
+            y += (ty - y) * 0.4;
+            if (Math.abs(tx - x) < 0.5 && Math.abs(ty - y) < 0.5) {
+                x = tx; y = ty; raf = null; place(); return;
+            }
+            place();
+            raf = requestAnimationFrame(loop);
+        }
+
+        function move(cx, cy) {
+            tx = cx; ty = cy;
+            el.classList.remove('hide');
+            if (REDUCED) { x = tx; y = ty; place(); return; }
+            if (!raf) raf = requestAnimationFrame(loop);
+        }
+
+        window.addEventListener('pointermove', (e) => {
+            if (e.pointerType === 'touch') return;
+            move(e.clientX, e.clientY);
+        }, { passive: true });
+
+        document.addEventListener('pointerover', (e) => {
+            el.classList.toggle('go', !!(e.target && e.target.closest && e.target.closest(HOT)));
+        });
+        document.addEventListener('pointerout', (e) => {
+            const rel = e.relatedTarget;
+            if (!rel || !rel.closest || !rel.closest(HOT)) el.classList.remove('go');
+        });
+
+        window.addEventListener('pointerleave', () => el.classList.add('hide'));
+        document.addEventListener('pointerenter', () => el.classList.remove('hide'));
+
+        place();
+    })();
 })();
