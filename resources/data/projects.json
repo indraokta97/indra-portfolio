@@ -1,5 +1,23 @@
 [
   {
+    "title": "RQ Keuangan",
+    "slug": "rq-keuangan",
+    "image": "/images/projects/rq-keuangan.png",
+    "description": "App catatan kas Rumah Quran — saldo, pemasukan, dan pengeluaran dengan foto bukti. Pengunjung hanya bisa melihat (termasuk bukti), pengelola masuk dengan token untuk mengelola.",
+    "long_description": "RQ KEUANGAN — CATATAN KAS RUMAH QURAN\n• Aplikasi pencatatan kas untuk Rumah Quran: saldo kas, pemasukan, dan pengeluaran dengan kategori\n• Lampiran foto bukti transaksi, diunggah otomatis ke Vercel Blob sebagai thumbnail WebP\n• Mode pengunjung (baca-saja): bisa melihat data dan foto bukti, tanpa tombol mengubah\n• Mode pengelola: masuk dengan token untuk menambah, mengubah, dan menghapus catatan\n\nGRAFIK & ANALISIS\n• Dashboard ringkasan saldo dan perbandingan pemasukan vs pengeluaran\n• Grafik arus kas per bulan dan komposisi kategori\n• Pencarian, filter, dan paginasi daftar transaksi\n\nTEKNIS\n• React + TypeScript + Vite + Tailwind CSS\n• API serverless di Vercel, database Neon (PostgreSQL), foto di Vercel Blob Storage\n• Autentikasi berbasis token (SHA-256) dengan dua tingkat akses: lihat saja vs kelola",
+    "gallery": [],
+    "gallery_captions": [],
+    "category": "Web Application",
+    "tags": "React,TypeScript,Vite,Tailwind CSS,PostgreSQL,Neon,Vercel",
+    "link": "https://rq-keuangan.vercel.app",
+    "youtube_link": null,
+    "github_link": "https://github.com/indraokta97/rq-keuangan",
+    "year": "2026",
+    "sort_order": 1,
+    "published": true,
+    "featured": false
+  },
+  {
     "title": "Nakula Organizer",
     "slug": "nakula-organizer",
     "image": "/images/projects/nakula-organizer.svg",
