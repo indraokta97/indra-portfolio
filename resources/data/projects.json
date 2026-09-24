@@ -4,7 +4,7 @@
     "slug": "rq-keuangan",
     "image": "/images/projects/rq-keuangan.png",
     "description": "Cash book app for a Rumah Qur'an UGM",
-    "long_description": "RUMAH QUR'AN UGM CASHBOOK",
+    "long_description": "RUMAH QUR'AN UGM CASHBOOK\n• Cash tracking app for a Rumah Quran: cash balance, income, and expenses with categories\n• Transaction proof photos, auto-uploaded to Vercel Blob as WebP thumbnails\n• Visitor (read-only) mode: can view data and proof photos, no edit buttons\n• Manager mode: token-based login to add, edit, and delete records\n\nCHARTS & ANALYTICS\n• Dashboard summary of balance and income vs expense comparison\n• Monthly cash-flow chart and category breakdown\n• Search, filter, and pagination for the transaction list\n\nTECH\n• React + TypeScript + Vite + Tailwind CSS\n• Serverless API on Vercel, Neon (PostgreSQL) database, photos on Vercel Blob Storage\n• Token-based auth (SHA-256) with two access levels: view-only vs manage",
     "gallery": [],
     "gallery_captions": [],
     "category": "Web Application",
